@@ -74,7 +74,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"Solidity/MyContract.sol": "Storage"
+			"MyContract.sol": "Storage"
 		},
 		"evmVersion": "byzantium",
 		"libraries": {},
@@ -85,7 +85,7 @@
 		"remappings": []
 	},
 	"sources": {
-		"Solidity/MyContract.sol": {
+		"MyContract.sol": {
 			"keccak256": "0xf2f7433343fa6aaae47b7172532f21ba752c34a4e3f024396de593a6e46b219d",
 			"urls": [
 				"bzzr://060d87f813144c6d8c937c7f406186aa0d86b1745725eee1ac877eb37dfa0746"

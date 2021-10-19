@@ -6,24 +6,6 @@
 	"output": {
 		"abi": [
 			{
-				"constant": false,
-				"inputs": [
-					{
-						"name": "_firstName",
-						"type": "string"
-					},
-					{
-						"name": "_lastName",
-						"type": "string"
-					}
-				],
-				"name": "addPerson",
-				"outputs": [],
-				"payable": false,
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
 				"constant": true,
 				"inputs": [],
 				"name": "peopleCount",
@@ -31,33 +13,6 @@
 					{
 						"name": "",
 						"type": "uint256"
-					}
-				],
-				"payable": false,
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"constant": true,
-				"inputs": [
-					{
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"name": "people",
-				"outputs": [
-					{
-						"name": "_id",
-						"type": "uint256"
-					},
-					{
-						"name": "_firstName",
-						"type": "string"
-					},
-					{
-						"name": "_lastName",
-						"type": "string"
 					}
 				],
 				"payable": false,
@@ -86,9 +41,9 @@
 	},
 	"sources": {
 		"MyContract.sol": {
-			"keccak256": "0xf2f7433343fa6aaae47b7172532f21ba752c34a4e3f024396de593a6e46b219d",
+			"keccak256": "0x47519aa0a1d9f116dfc015cadacbd01d824cc9131f8527a826ce18b56476b91e",
 			"urls": [
-				"bzzr://060d87f813144c6d8c937c7f406186aa0d86b1745725eee1ac877eb37dfa0746"
+				"bzzr://81b93199cd929c377634325c29114d5100f6b02577ac0f7c709bddf76178e663"
 			]
 		}
 	},

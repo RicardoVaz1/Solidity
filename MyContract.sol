@@ -61,7 +61,7 @@ contract Storage {
     
     
     //Exercicio 4 - Mapping
-    uint256 public peopleCount = 0;
+    /* uint256 public peopleCount = 0;
     mapping(uint => Person) public people;
     
     struct Person {
@@ -76,5 +76,9 @@ contract Storage {
         
         peopleCount += 1;
         people[peopleCount] = Person(peopleCount, _firstName, _lastName);
-    }
+    } */
+    
+    
+    //Exercicio 5
+    uint256 public peopleCount = 0;
 }

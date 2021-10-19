@@ -6,57 +6,12 @@
 	"output": {
 		"abi": [
 			{
-				"constant": false,
-				"inputs": [
-					{
-						"name": "_firstName",
-						"type": "string"
-					},
-					{
-						"name": "_lastName",
-						"type": "string"
-					}
-				],
-				"name": "addPerson",
-				"outputs": [],
-				"payable": false,
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
 				"constant": true,
 				"inputs": [],
-				"name": "peopleCount",
+				"name": "value",
 				"outputs": [
 					{
 						"name": "",
-						"type": "uint256"
-					}
-				],
-				"payable": false,
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"constant": true,
-				"inputs": [
-					{
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"name": "people",
-				"outputs": [
-					{
-						"name": "_id",
-						"type": "uint256"
-					},
-					{
-						"name": "_firstName",
-						"type": "string"
-					},
-					{
-						"name": "_lastName",
 						"type": "string"
 					}
 				],
@@ -74,7 +29,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"MyContract_4.sol": "Storage"
+			"MyContract_5.sol": "Storage"
 		},
 		"evmVersion": "byzantium",
 		"libraries": {},
@@ -85,10 +40,10 @@
 		"remappings": []
 	},
 	"sources": {
-		"MyContract_4.sol": {
-			"keccak256": "0xab96c2c0f8e5c6b5f484b9f0f2c7021fa596466022d37f848ea4fbcef16c010a",
+		"MyContract_5.sol": {
+			"keccak256": "0xc7e1a48a87ab3664085a7f69a1fa3bbdb4a566c0c437b66e7619ec1528b1492c",
 			"urls": [
-				"bzzr://0cfb575ddb4cd127377b020a88aa103d5c9bcd432527b4c49887fc7e2a43fc94"
+				"bzzr://3e101e133219c6b1ba341dd28203ee0ff44da8c66cbe40e61016c57cde1e40cb"
 			]
 		}
 	},

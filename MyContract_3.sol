@@ -1,7 +1,7 @@
 pragma solidity 0.5.1;
 
 contract Storage {
-    //Exercicio 3 - Array
+    //Exercicio 3 - Array 
     Person[] public people;
     
     uint256 public peopleCount;

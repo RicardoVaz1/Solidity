@@ -1,7 +1,7 @@
 pragma solidity 0.5.1;
 
 contract Storage {
-    //Exercicio 4 - Mapping
+    //Exercicio 4 - Mapping 
     uint256 public peopleCount = 0;
     mapping(uint => Person) public people;
     

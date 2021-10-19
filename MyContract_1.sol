@@ -1,7 +1,7 @@
 pragma solidity 0.5.1;
 
 contract Storage {
-    //Exercicio 1
+    //Exercicio 1 
     string public value = "myValue";
     //string public constant value = "myValue";
     bool public myBool = true;

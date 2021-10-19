@@ -1,7 +1,7 @@
 pragma solidity 0.5.1;
 
 contract Storage {
-    //Exercicio 2 
+    //Exercicio 2
     enum State {Waiting, Ready, Active}
     State public state;
     
@@ -9,7 +9,7 @@ contract Storage {
         state = State.Waiting;
     }
     
-    function activate() public{
+    function activate() public {
         state = State.Active;
     }
     

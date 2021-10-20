@@ -1,12 +1,12 @@
 pragma solidity 0.5.1;
 
 contract Storage {
-    //Exercicio 1
+    //Exercise 1
     string public value = "myValue";
     //string public constant value = "myValue";
     bool public myBool = true;
-    int public myInt = -1; //pode ser negativo
-    uint public myUint = 1; //nao pode ser negativo
+    int public myInt = -1; //can be negative
+    uint public myUint = 1; //can't be negative
     uint8 public myUint8 = 8;
     uint256 public myUint256 = 99999;
     

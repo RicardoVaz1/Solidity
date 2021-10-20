@@ -1,0 +1,36 @@
+{
+	"compiler": {
+		"version": "0.5.1+commit.c8a2cb62"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"methods": {}
+		},
+		"userdoc": {
+			"methods": {}
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			".deps/npm/@nomiclabs/buidler/console.sol": "console"
+		},
+		"evmVersion": "byzantium",
+		"libraries": {},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		".deps/npm/@nomiclabs/buidler/console.sol": {
+			"keccak256": "0xd3f9eb69241af8de5174a6cfa3da3cbc94e351dee495002d8675b665865ba417",
+			"urls": [
+				"bzzr://febe9ef8dee6d3352e6374d2022f5b68bcf97af83363dd765d6b9f76c0ae7a33"
+			]
+		}
+	},
+	"version": 1
+}

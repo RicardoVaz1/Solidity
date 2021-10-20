@@ -1,7 +1,7 @@
 pragma solidity 0.5.1;
 
 contract Storage {
-    //Exercicio 3 - Array
+    //Exercise 3 - Array
     Person[] public people;
     
     uint256 public peopleCount;
@@ -12,8 +12,8 @@ contract Storage {
     }
     
     function addPerson(string memory _firstName, string memory _lastName) public {
-        require(bytes(_firstName).length > 0); //tem que estar preenchido
-        require(bytes(_lastName).length > 0); //tem que estar preenchido
+        require(bytes(_firstName).length > 0); //need to be filled
+        require(bytes(_lastName).length > 0); //need to be filled
         
         people.push(Person(_firstName, _lastName));
         peopleCount += 1;

@@ -6,63 +6,43 @@
 	"output": {
 		"abi": [
 			{
-				"constant": false,
+				"constant": true,
 				"inputs": [
 					{
-						"name": "_firstName",
-						"type": "string"
-					},
-					{
-						"name": "_lastName",
-						"type": "string"
+						"name": "",
+						"type": "address"
 					}
 				],
-				"name": "addPerson",
+				"name": "balances",
+				"outputs": [
+					{
+						"name": "",
+						"type": "int256"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [],
+				"name": "buyToken",
 				"outputs": [],
+				"payable": true,
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"name": "_wallet",
+						"type": "address"
+					}
+				],
 				"payable": false,
 				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"constant": true,
-				"inputs": [],
-				"name": "peopleCount",
-				"outputs": [
-					{
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"payable": false,
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"constant": true,
-				"inputs": [
-					{
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"name": "people",
-				"outputs": [
-					{
-						"name": "_id",
-						"type": "uint256"
-					},
-					{
-						"name": "_firstName",
-						"type": "string"
-					},
-					{
-						"name": "_lastName",
-						"type": "string"
-					}
-				],
-				"payable": false,
-				"stateMutability": "view",
-				"type": "function"
+				"type": "constructor"
 			}
 		],
 		"devdoc": {
@@ -74,7 +54,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"MyContract_4.sol": "Storage"
+			"Exercise_7.sol": "Storage"
 		},
 		"evmVersion": "byzantium",
 		"libraries": {},
@@ -85,10 +65,10 @@
 		"remappings": []
 	},
 	"sources": {
-		"MyContract_4.sol": {
-			"keccak256": "0xab96c2c0f8e5c6b5f484b9f0f2c7021fa596466022d37f848ea4fbcef16c010a",
+		"Exercise_7.sol": {
+			"keccak256": "0xcbb07a16a3534d79a91563e5e07718fdccd00e3fb51f85167c475b77ecfeb8fe",
 			"urls": [
-				"bzzr://0cfb575ddb4cd127377b020a88aa103d5c9bcd432527b4c49887fc7e2a43fc94"
+				"bzzr://c68a3e7b2c0f6ba5db08d12ae52cedddad995c244b584576a53d3ec67e7a1553"
 			]
 		}
 	},

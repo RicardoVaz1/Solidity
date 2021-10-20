@@ -15,7 +15,7 @@ contract Storage {
     }
     
     modifier onlyWhileOpen() {
-        //CurrentTime shold be equal or higher to the openingTime
+        //CurrentTime should be equal or higher than openingTime
         
         require(block.timestamp >= openingTime); //block.timestamp - get the value of epoch time
         _;

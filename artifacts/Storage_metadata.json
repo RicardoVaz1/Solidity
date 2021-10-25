@@ -6,18 +6,31 @@
 	"output": {
 		"abi": [
 			{
-				"constant": true,
+				"constant": false,
 				"inputs": [
 					{
-						"name": "",
-						"type": "address"
+						"name": "_firstName",
+						"type": "string"
+					},
+					{
+						"name": "_lastName",
+						"type": "string"
 					}
 				],
-				"name": "balances",
+				"name": "addPerson",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "peopleCount",
 				"outputs": [
 					{
 						"name": "",
-						"type": "int256"
+						"type": "uint256"
 					}
 				],
 				"payable": false,
@@ -25,24 +38,31 @@
 				"type": "function"
 			},
 			{
-				"constant": false,
-				"inputs": [],
-				"name": "buyToken",
-				"outputs": [],
-				"payable": true,
-				"stateMutability": "payable",
-				"type": "function"
-			},
-			{
+				"constant": true,
 				"inputs": [
 					{
-						"name": "_wallet",
-						"type": "address"
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "people",
+				"outputs": [
+					{
+						"name": "_id",
+						"type": "uint256"
+					},
+					{
+						"name": "_firstName",
+						"type": "string"
+					},
+					{
+						"name": "_lastName",
+						"type": "string"
 					}
 				],
 				"payable": false,
-				"stateMutability": "nonpayable",
-				"type": "constructor"
+				"stateMutability": "view",
+				"type": "function"
 			}
 		],
 		"devdoc": {
@@ -54,7 +74,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"Exercise_7.sol": "Storage"
+			"Exercise_6.sol": "Storage"
 		},
 		"evmVersion": "byzantium",
 		"libraries": {},
@@ -65,10 +85,10 @@
 		"remappings": []
 	},
 	"sources": {
-		"Exercise_7.sol": {
-			"keccak256": "0xbb166fd297dd1ed62010074f35aae75740151ec7a339a8deee63f743edff3a6d",
+		"Exercise_6.sol": {
+			"keccak256": "0x8b5def217ff518a2b66997e2e89f529174f28533329e90799b91132aacfb2608",
 			"urls": [
-				"bzzr://9a195ba4a146ef9c4f50cbb501f6ed951f4b62318f2b0e5e9dd0db83f9be22d5"
+				"bzzr://bbb2b4dc44322b7060df29b73adf0bf17768bb3c3caace0467e16d254c0df2a6"
 			]
 		}
 	},

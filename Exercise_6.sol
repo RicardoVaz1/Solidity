@@ -16,10 +16,10 @@ contract Storage {
     }
     
     modifier onlyWhileOpen() {
-        //The best way to "get now" in Solidty, is to get the current block timestamp
+        //block.timestamp - The best way to "get now" in Solidty, is to get the current block timestamp
         
         //CurrentTime should be equal or higher than openingTime
-        require(block.timestamp >= openingTime); //block.timestamp - get the value of epoch time
+        require(block.timestamp >= openingTime);
         _;
     }
     

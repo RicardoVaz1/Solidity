@@ -23,7 +23,7 @@ contract Storage {
     }
     
     modifier onlyOwner() {
-        //msg - global keyword that stands fot the function metadata that's passed in
+        //msg - global keyword that stands for the function metadata that's passed in
         //msg.sender - its the account/address who called the function
         
         require(msg.sender == owner); //if true continue, if false throw an error

@@ -9,13 +9,12 @@ contract Storage {
         wallet = _wallet;
     }
     
-    
+    //payable - in order to buyToken() function accept ether, we need to add "payable" modifier
     function buyToken() public payable {
         // buy a token
         balances[msg.sender] += 1;
         
-        
         // send ether to the wallet
         wallet.transfer(msg.value);
     }
-}
+}   

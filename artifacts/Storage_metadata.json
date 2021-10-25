@@ -66,9 +66,9 @@
 	},
 	"sources": {
 		"Exercise_7.sol": {
-			"keccak256": "0xcbb07a16a3534d79a91563e5e07718fdccd00e3fb51f85167c475b77ecfeb8fe",
+			"keccak256": "0xbb166fd297dd1ed62010074f35aae75740151ec7a339a8deee63f743edff3a6d",
 			"urls": [
-				"bzzr://c68a3e7b2c0f6ba5db08d12ae52cedddad995c244b584576a53d3ec67e7a1553"
+				"bzzr://9a195ba4a146ef9c4f50cbb501f6ed951f4b62318f2b0e5e9dd0db83f9be22d5"
 			]
 		}
 	},

@@ -6,7 +6,8 @@ contract Storage {
     mapping(uint => Person) public people;
     
     //https://www.epochconverter.com/
-    uint256 openingTime = 1634748140; //epoch time is in seconds
+    //https://www.epochconverter.com/clock
+    uint256 openingTime = 1635180462; //epoch time its in seconds
     
     struct Person {
         uint _id;
@@ -15,8 +16,9 @@ contract Storage {
     }
     
     modifier onlyWhileOpen() {
-        //CurrentTime should be equal or higher than openingTime
+        //The best way to "get now" in Solidty, is to get the current block timestamp
         
+        //CurrentTime should be equal or higher than openingTime
         require(block.timestamp >= openingTime); //block.timestamp - get the value of epoch time
         _;
     }

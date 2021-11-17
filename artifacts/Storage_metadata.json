@@ -7,22 +7,13 @@
 		"abi": [
 			{
 				"constant": true,
-				"inputs": [],
-				"name": "myUint",
-				"outputs": [
+				"inputs": [
 					{
 						"name": "",
-						"type": "uint256"
+						"type": "address"
 					}
 				],
-				"payable": false,
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"constant": true,
-				"inputs": [],
-				"name": "myInt",
+				"name": "balances",
 				"outputs": [
 					{
 						"name": "",
@@ -34,91 +25,21 @@
 				"type": "function"
 			},
 			{
-				"constant": true,
+				"constant": false,
 				"inputs": [],
-				"name": "value",
-				"outputs": [
-					{
-						"name": "",
-						"type": "string"
-					}
-				],
-				"payable": false,
-				"stateMutability": "view",
+				"name": "buyToken",
+				"outputs": [],
+				"payable": true,
+				"stateMutability": "payable",
 				"type": "function"
 			},
 			{
-				"constant": false,
 				"inputs": [
 					{
-						"name": "_value",
-						"type": "string"
+						"name": "_wallet",
+						"type": "address"
 					}
 				],
-				"name": "set",
-				"outputs": [],
-				"payable": false,
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"constant": true,
-				"inputs": [],
-				"name": "get",
-				"outputs": [
-					{
-						"name": "",
-						"type": "string"
-					}
-				],
-				"payable": false,
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"constant": true,
-				"inputs": [],
-				"name": "myBool",
-				"outputs": [
-					{
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"payable": false,
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"constant": true,
-				"inputs": [],
-				"name": "myUint256",
-				"outputs": [
-					{
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"payable": false,
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"constant": true,
-				"inputs": [],
-				"name": "myUint8",
-				"outputs": [
-					{
-						"name": "",
-						"type": "uint8"
-					}
-				],
-				"payable": false,
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
 				"payable": false,
 				"stateMutability": "nonpayable",
 				"type": "constructor"
@@ -133,7 +54,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"Exercise_1.sol": "Storage"
+			"Exercise_7.sol": "Storage"
 		},
 		"evmVersion": "byzantium",
 		"libraries": {},
@@ -144,10 +65,10 @@
 		"remappings": []
 	},
 	"sources": {
-		"Exercise_1.sol": {
-			"keccak256": "0x8427f74722fcbdf076618e505bbfe7a8ec29c01d5f886f12970eff8bf13c70e8",
+		"Exercise_7.sol": {
+			"keccak256": "0xbb166fd297dd1ed62010074f35aae75740151ec7a339a8deee63f743edff3a6d",
 			"urls": [
-				"bzzr://dcc8bc0f47c30a7264e2edb9c937f6a7485e010907cb3a021c19e21533bde246"
+				"bzzr://9a195ba4a146ef9c4f50cbb501f6ed951f4b62318f2b0e5e9dd0db83f9be22d5"
 			]
 		}
 	},

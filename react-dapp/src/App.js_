@@ -1,0 +1,100 @@
+// import logo from "./logo.svg";
+
+import { useState } from "react";
+import { ethers } from "ethers";
+import "./App.css";
+import Greeter from "./artifacts/contracts/Greeter.sol/Greeter.json";
+
+const greeterAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
+function App() {
+  const [greeting, setGreetingValue] = useState();
+
+  async function requestAccount() {
+    //connect to the Metamask Wallet of the user
+    await window.ethereum.request({ method: "eth_requestAccounts" }); //request the account information from the Metamask Wallet
+
+    //return an array of accounts
+  }
+
+  async function fetchGreeting() {
+    //It looks if Metamask extension its connected
+    if (typeof window.ethereum !== "undefined") {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const contract = new ethers.Contract(
+        greeterAddress,
+        Greeter.abi,
+        provider
+      );
+
+      try {
+        const data = await contract.greet();
+        console.log("data: ", data);
+      } catch (err) {
+        console.log("Error: ", err);
+      }
+    }
+  }
+
+  async function setGreeting() {
+    if (!greeting) return;
+    if (typeof window.ethereum !== "undefined") {
+      await requestAccount();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(greeterAddress, Greeter.abi, signer);
+      const trasaction = await contract.setGreeting(greeting); //its the greeting variable that's local (it's what user type into the form to update the greeting)
+
+      setGreetingValue("");
+
+      await trasaction.wait(); //wait for the transaction confirmation on blockchain
+      fetchGreeting(); //log out the new value
+    }
+  }
+
+  //Button Style
+  // const myButton = { fontSize: "30px", padding: "10px", margin: "5px" };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        {/* <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a> */}
+        <button
+          /*style={myButton}*/
+          className="myButton"
+          onClick={fetchGreeting}
+        >
+          Get Greeting
+        </button>
+        <button
+          /*style={myButton}*/
+          className="myButton"
+          onClick={setGreeting}
+        >
+          Set Greeting
+        </button>
+
+        <input
+          /*style={myButton}*/
+          className="myButton"
+          onChange={(e) => setGreetingValue(e.target.value)}
+          placeholder="Set Greeting"
+          value={greeting}
+        />
+      </header>
+    </div>
+  );
+}
+
+export default App;

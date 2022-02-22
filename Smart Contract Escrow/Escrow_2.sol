@@ -5,7 +5,7 @@ pragma solidity >=0.7.0 <0.9.0;
 contract Escrow {
 
     // VARIABLES
-    enum State { NOT_INITIATED, AWAITING_PAYMENT, AWAITING_DELIVERY, COMPLETE }
+    enum State { NOT_INITIATED, AWAITING_PAYMENT, WAIT_A_MOMENT, COMPLETE }
 
     State public currsState;
 
@@ -59,7 +59,7 @@ contract Escrow {
     function deposit() onlyBuyer public payable {
         require(currsState == State.AWAITING_PAYMENT, "Already paid");
         require(msg.value == price, "Wrong deposit amount");
-        currsState = State.AWAITING_DELIVERY;
+        currsState = State.WAIT_A_MOMENT;
         
         //require(block.timestamp - lastRun > 1 minutes, 'Need to wait 1 minute'); // https://stackoverflow.com/questions/68024206/run-solidity-code-after-every-x-amount-of-time
         //timer();

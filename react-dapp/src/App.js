@@ -193,6 +193,18 @@ function App() {
     }
   }
 
+  //const [codigoInserido, setCodigoInserido] = useState(0);
+  // const [codigoGerado, setcodigoGerado] = useState("");
+  const codigoGerado = gerarCodigo();
+
+  function gerarCodigo() {
+    var min = 1000000;
+    var max = 9999999;
+    var num = Math.floor(Math.random() * (max - min + 1) + min);
+
+    return num;
+  }
+
   async function sendCoins2() {
     var userAccount2 = merchantAddress;
     var amount2 = precoProduto2;
@@ -205,6 +217,13 @@ function App() {
       await trasaction.wait();
       console.log(`${amount2} Coins successfully sent to ${userAccount2}`);
       // console.log("Coins successfully sent");
+
+      // var codigo = gerarCodigo();
+
+      console.log("Código Gerado: ", codigoGerado);
+
+      document.getElementById("codigoGerado").innerHTML =
+        "Código: " + codigoGerado;
     }
   }
 
@@ -245,6 +264,19 @@ function App() {
     }
   }
 
+  function validarCodigo(numero_inserido, numero_original) {
+    if (numero_inserido.toString().length == 7) {
+      if (numero_original == numero_inserido) {
+        console.log("Código Original: ", numero_original);
+        console.log("Código Inserido: ", numero_inserido);
+
+        document.getElementById("validarCodigo").innerHTML = "Valid Code!!";
+        document.getElementById("valorInserido").style.display = "none";
+      } else
+        document.getElementById("validarCodigo").innerHTML = "Invalid Code!!";
+    } else document.getElementById("validarCodigo").innerHTML = "";
+  }
+
   /* Código para obter os Dados Através do Bloco/Transação
     let transactionHash =
       "0x60c955508fe805b2214ca3445292950f0ad7f5959a559db0e56bc019f51d1dea";
@@ -274,8 +306,8 @@ function App() {
 
   /* ------- Obtem Historico Transações ------- */
   /* Original
-  function getHistory_original() {
-    // console.log("History!");
+  function getHistoric_original() {
+    // console.log("Historic!");
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     // console.log(
@@ -348,7 +380,7 @@ function App() {
                </tr>`;
     });
 
-    document.getElementById("historyTable").innerHTML =
+    document.getElementById("historicTable").innerHTML =
       `<table style="margin-bottom: 0px">
         <tbody>
           <tr>
@@ -362,7 +394,7 @@ function App() {
       </table>`;
   }*/
 
-  function getHistory() {
+  function getHistoric() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
     provider.getBlock("latest").then((block) => {
@@ -409,14 +441,14 @@ function App() {
       console.log("Timestamp: ", time);
       console.log("Hash: ", block.hash);
       console.log("Transactions: ", block.transactions);
-      console.log(block); //Todos os Dados Obtidos Através do Nº do Bloco
+      console.log("Dados Obtidos Através do Nº do Bloco:", block); //Todos os Dados Obtidos Através do Nº do Bloco
 
       //Dados Obtidos Através do Hash da Transação
       provider.getTransaction(block.transactions[0]).then((receipt) => {
         console.log("From: ", receipt.from);
         console.log("To: ", receipt.to);
         console.log("Value: ", receipt.value);
-        console.log(receipt); //Todos os Dados Obtidos Através do Hash da Transação
+        console.log("Dados Obtidos Através do Hash da Transação:", receipt); //Todos os Dados Obtidos Através do Hash da Transação
 
         var array2 = {
           date: time,
@@ -436,7 +468,7 @@ function App() {
                    </tr>`;
         // });
 
-        document.getElementById("historyTable").innerHTML =
+        document.getElementById("historicTable").innerHTML =
           `<table style="margin-bottom: 0px">
             <tbody>
               <tr>
@@ -470,7 +502,7 @@ function App() {
                </tr>`;
     });
 
-    document.getElementById("historyTable").innerHTML =
+    document.getElementById("historicTable").innerHTML =
       `<table style="margin-bottom: 0px">
         <tbody>
           <tr>
@@ -489,7 +521,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <br />
-        {/* ----- Exercicio 1 ----- */}
+        {/* ----- Exercicio 1 ----- /}
         <div id="Exercicio_1" className="sideButtons">
           <div style={{ width: "50%" }}>
             <h3>Merchant</h3>
@@ -513,15 +545,9 @@ function App() {
                 Buy Product
               </button>
             </div>
-            {/* <div style={{ display: "inline-flex" }}>
-              <p style={{ marginRight: "10px" }}>NFT 2: {precoProduto2} ETH</p>
-              <button className="myButton" onClick={buyProduct("2")}>
-                Buy Product
-              </button>
-            </div> */}
-            {/* Refund */}
             <br />
             <br />
+
             <div>
               <input
                 style={{ width: "50%" }}
@@ -562,11 +588,11 @@ function App() {
         </div>
         {/* ----------------------- */}
 
-        <br />
+        {/* <br />
         <hr />
-        <br />
+        <br /> */}
 
-        {/* ----- Exercicio 2 ----- */}
+        {/* ----- Exercicio 2 ----- /}
         <div id="Exercicio_2">
           <button className="myButton" onClick={fetchGreeting}>
             Get Greeting
@@ -587,11 +613,11 @@ function App() {
         </div>
         {/* ----------------------- */}
 
-        <br />
+        {/* <br />
         <hr />
-        <br />
+        <br /> */}
 
-        {/* ----- Exercicio 3 ----- */}
+        {/* ----- Exercicio 3 ----- /}
         <div id="Exercicio_3">
           <button className="myInput" onClick={getBalance}>
             Get Balance
@@ -614,8 +640,10 @@ function App() {
         </div>
         {/* ----------------------- */}
 
-        <br />
+        {/* <br />
         <hr />
+        <br /> */}
+        <br />
         <br />
 
         {/* ----- Exercicio 4 ----- */}
@@ -645,6 +673,7 @@ function App() {
               <button className="myButton" onClick={sendCoins2}>
                 Buy Product
               </button>
+              <p id="codigoGerado" style={{ marginLeft: "10px" }}></p>
             </div>
             {/* Refund */}
             <br />
@@ -689,6 +718,21 @@ function App() {
                 </tr>
               </tbody>
             </table>
+
+            <div>
+              <input
+                style={{ width: "20%" }}
+                className="myInput"
+                // onChange={(e) => setCodigoInserido(e.target.value)}
+                onChange={(e) => validarCodigo(e.target.value, codigoGerado)}
+                placeholder="Code"
+                id="valorInserido"
+              />
+              {/* <button className="myInput" onClick={validarCodigo(codigoGerado)}>
+                Check
+              </button> */}
+            </div>
+            <p id="validarCodigo"></p>
           </div>
         </div>
 
@@ -696,22 +740,20 @@ function App() {
         <br />
 
         <div
-          id="Exercicio_4_History"
+          id="Exercicio_4_Historic"
           style={{ display: "-webkit-inline-box", width: "80%" }}
         >
           <button
             style={{ marginBottom: "20px" }}
             className="myInput"
-            onClick={getHistory}
+            onClick={getHistoric}
           >
-            History
+            Historic
           </button>
         </div>
 
-        <div style={{ width: "80%" }} id="historyTable"></div>
+        <div style={{ width: "80%" }} id="historicTable"></div>
         {/* ----------------------- */}
-
-        <br />
       </header>
     </div>
   );

@@ -1,6 +1,6 @@
 # Solidity:
 
---> Exercises
---> Crypto Subscription
---> react-dapp
---> Smart Contract Escrow
+- Exercises
+- Crypto Subscription
+- react-dapp
+- Smart Contract Escrow

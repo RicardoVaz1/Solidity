@@ -5,12 +5,12 @@ pragma solidity >=0.7.0 <0.9.0;
 contract Escrow {
 
     // VARIABLES
-    enum State { NOT_INITIATED, AWAITING_PAYMENT, WAIT_A_MOMENT, COMPLETE }
+    enum State { AWAITING_PAYMENT, WAIT_A_MOMENT, COMPLETE }
 
     State public currsState;
 
-    bool public isBuyerIn;
-    bool public isMerchantIn;
+    //bool public isBuyerIn;
+    //bool public isMerchantIn;
 
     uint price;
 
@@ -30,10 +30,15 @@ contract Escrow {
         _;
     }
 
-    modifier escrowNotStarted() {
+    /*modifier escrowNotStarted() {
         require(currsState == State.NOT_INITIATED);
         _;
-    }
+    }*/
+
+    /*modifier escrowStarted() {
+        currsState = State.AWAITING_PAYMENT;
+        _;
+    }*/
 
 
 
@@ -44,7 +49,7 @@ contract Escrow {
         price = product_price * (1 ether);
     }
 
-    function initContract () escrowNotStarted public {
+    /*function initContract () escrowNotStarted public {
         if(msg.sender == buyer) {
             isBuyerIn = true;
         }
@@ -54,7 +59,8 @@ contract Escrow {
         if (isBuyerIn && isMerchantIn) {
             currsState = State.AWAITING_PAYMENT;
         }
-    }
+    }*/
+
 
     function deposit() onlyBuyer public payable {
         require(currsState == State.AWAITING_PAYMENT, "Already paid");
@@ -64,12 +70,11 @@ contract Escrow {
         //require(block.timestamp - lastRun > 1 minutes, 'Need to wait 1 minute'); // https://stackoverflow.com/questions/68024206/run-solidity-code-after-every-x-amount-of-time
         //timer();
         
-        startingTime = block.timestamp;
-        endingTime = startingTime + 60; // 1 minute
+        //startingTime = block.timestamp;
+        //endingTime = startingTime + 60; // 1 minute
 
-        require(block.timestamp >= endingTime);
 
-        transactionSucess();
+        //transactionSucess();
         //lastRun = block.timestamp;
     }
 
@@ -93,7 +98,16 @@ contract Escrow {
         lastRun = block.timestamp;
     }*/
 
+    function wait() public {
+        require(currsState == State.WAIT_A_MOMENT, "Not in the corect stage!");
+        startingTime = block.timestamp;
+        endingTime = startingTime + 60; // 1 minute
+
+        transactionSucess();
+    }
+
     function transactionSucess() payable public {
+        require(block.timestamp >= endingTime);
         merchant.transfer(price);
         currsState = State.COMPLETE;
     }

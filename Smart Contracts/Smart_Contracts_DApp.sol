@@ -57,6 +57,7 @@ contract Escrow {
     }
 }
 
+
 contract Historic {
     // Date | Transaction_Type | From | To | Value | Status
 
@@ -182,6 +183,7 @@ contract Historic {
         */
     }
 }
+
 
 contract Refunds {
     // VARIABLES

@@ -10,12 +10,12 @@ contract Escrow {
     State public currsState;
 
     bool public isBuyerIn;
-    bool public isSellerIn;
+    bool public isMerchantIn;
 
     uint price;
 
     address buyer;
-    address payable seller;
+    address payable merchant;
 
     uint256 lastRun;
 
@@ -38,9 +38,9 @@ contract Escrow {
 
 
     // FUNCTIONS
-    constructor(address _buyer, address payable _seller, uint _price){
+    constructor(address _buyer, address payable _merchant, uint _price){
         buyer = _buyer;
-        seller = _seller;
+        merchant = _merchant;
         price = _price * (1 ether);
     }
 
@@ -48,10 +48,10 @@ contract Escrow {
         if(msg.sender == buyer) {
             isBuyerIn = true;
         }
-        if (msg.sender == seller) {
-            isSellerIn = true;
+        if (msg.sender == merchant) {
+            isMerchantIn = true;
         }
-        if (isBuyerIn && isSellerIn) {
+        if (isBuyerIn && isMerchantIn) {
             currsState = State.AWAITING_PAYMENT;
         }
     }
@@ -75,7 +75,7 @@ contract Escrow {
 
     /*function confirmDelivery() onlyBuyer payable public {
         require(currsState == State.AWAITING_DELIVERY, "Cannot confirm delivery");
-        seller.transfer(price);
+        merchant.transfer(price);
         currsState = State.COMPLETE;
     }
 
@@ -94,7 +94,7 @@ contract Escrow {
     }*/
 
     function transactionSucess() payable public {
-        seller.transfer(price);
+        merchant.transfer(price);
         currsState = State.COMPLETE;
     }
 }

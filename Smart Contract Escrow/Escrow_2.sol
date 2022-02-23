@@ -38,10 +38,10 @@ contract Escrow {
 
 
     // FUNCTIONS
-    constructor(address _buyer, address payable _merchant, uint _price){
-        buyer = _buyer;
-        merchant = _merchant;
-        price = _price * (1 ether);
+    constructor(address buyer_address, address payable merchant_address, uint product_price){
+        buyer = buyer_address;
+        merchant = merchant_address;
+        price = product_price * (1 ether);
     }
 
     function initContract () escrowNotStarted public {

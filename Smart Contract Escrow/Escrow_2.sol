@@ -2,12 +2,9 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-
 contract Escrow {
-
     // VARIABLES
     enum State { AWAITING_PAYMENT, WAIT_A_MOMENT, COMPLETE }
-
     State public currsState;
 
     address buyer;
@@ -16,11 +13,9 @@ contract Escrow {
     uint price;
     uint i;
 
-
     /*uint256 public z_startingTime;
     uint256 public z_endingTime;
     uint256 public z_actualTime = block.timestamp;*/
-
 
 
     // MODIFIERS
@@ -28,7 +23,6 @@ contract Escrow {
         require(msg.sender == buyer, "Only Buyer can call this function");
         _;
     }
-
 
 
     // FUNCTIONS
@@ -64,30 +58,36 @@ contract Escrow {
 }
 
 contract Historic {
-
     // Date | Transaction_Type | From | To | Value | Status
 
-    uint256 Date;
-
-    enum Type { Sell, Refund }
-    Type currentType;
-
-    address From;
-    address To;
-
-    uint256 Value;
-
+    // VARIABLES
+    enum Transaction_Type { Sell, Refund }
     enum Status { Pending, Complete }
-    Status currentStatus;
+
+    struct transactionStruct {
+        uint256 Date;
+
+        Transaction_Type currentType;
+
+        address From;
+        address To;
+
+        uint256 Value;
+
+        Status currentStatus;
+    }
 
     address merchant;
 
 
+    // MODIFIERS
     modifier onlyMerchant() {
         require(msg.sender == merchant, "Only Merchant can call this function");
         _;
     }
 
+
+    // FUNCTIONS
     function getHistoric() onlyMerchant public {
         /*const provider = new ethers.providers.Web3Provider(window.ethereum);
 
@@ -184,18 +184,20 @@ contract Historic {
 }
 
 contract Refunds {
-
+    // VARIABLES
     address payable buyer;
     address payable merchant;
     uint value;
 
+
+    // MODIFIERS
     modifier onlyMerchant() {
         require(msg.sender == merchant, "Only Merchant can call this function");
         _;
     }
 
 
-    
+    // FUNCTIONS
     constructor(address payable buyer_address, address payable merchant_address, uint refund_value){
         buyer = buyer_address;
         merchant = merchant_address;

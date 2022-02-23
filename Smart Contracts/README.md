@@ -1,1 +1,1 @@
-**Note:** Use [Remix IDE](https://remix.ethereum.org/) to compile this Smart Contract.
+**Note:** Use [Remix IDE](https://remix.ethereum.org/) to compile this Smart Contracts.

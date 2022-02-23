@@ -78,6 +78,8 @@ contract Historic {
         Status currentStatus;
     }
 
+    transactionStruct transaction;
+
     address merchant;
 
 
@@ -90,95 +92,98 @@ contract Historic {
 
     // FUNCTIONS
     function getHistoric() onlyMerchant public {
+        if(transaction.From == merchant) transaction.currentType = Transaction_Type.Refund;
+        if(transaction.To == merchant) transaction.currentType = Transaction_Type.Sell;
+
         /*const provider = new ethers.providers.Web3Provider(window.ethereum);
 
         provider.getBlock("latest").then((block) => {
-        //Converter o timestamp para DD/MM/AA - HH:MM:SS
-        var a = new Date(block.timestamp * 1000);
-        var months = [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-        ];
-        var year = a.getFullYear();
-        var month = months[a.getMonth()];
-        var date = a.getDate();
-        var hour = a.getHours();
-        var min = a.getMinutes();
-        var sec = a.getSeconds();
+            //Convert the timestamp to DD/MM/AA - HH:MM:SS
+            var a = new Date(block.timestamp * 1000);
+            var months = [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+            ];
+            var year = a.getFullYear();
+            var month = months[a.getMonth()];
+            var date = a.getDate();
+            var hour = a.getHours();
+            var min = a.getMinutes();
+            var sec = a.getSeconds();
 
-        if (min < 10) min = "0" + min;
-        if (sec < 10) sec = "0" + sec;
-        var time =
-            date +
-            "/" +
-            month +
-            "/" +
-            year +
-            "<br/> " +
-            hour +
-            ":" +
-            min +
-            ":" +
-            sec;
+            if (min < 10) min = "0" + min;
+            if (sec < 10) sec = "0" + sec;
+            var time =
+                date +
+                "/" +
+                month +
+                "/" +
+                year +
+                "<br/> " +
+                hour +
+                ":" +
+                min +
+                ":" +
+                sec;
 
-        //Dados Obtidos Através do Nº do Bloco
-        console.log("Block Number: ", block.number);
-        console.log("Timestamp: ", time);
-        console.log("Hash: ", block.hash);
-        console.log("Transactions: ", block.transactions);
-        console.log("Dados Obtidos Através do Nº do Bloco:", block); //Todos os Dados Obtidos Através do Nº do Bloco
+            //Data Obtained Through Block Nº
+            console.log("Block Number: ", block.number);
+            console.log("Timestamp: ", time);
+            console.log("Hash: ", block.hash);
+            console.log("Transactions: ", block.transactions);
+            console.log("Data Obtained Through Block Nº:", block); //All Data Obtained Through Block Nº
 
-        //Dados Obtidos Através do Hash da Transação
-        provider.getTransaction(block.transactions[0]).then((receipt) => {
-            console.log("From: ", receipt.from);
-            console.log("To: ", receipt.to);
-            console.log("Value: ", receipt.value);
-            console.log("Dados Obtidos Através do Hash da Transação:", receipt); //Todos os Dados Obtidos Através do Hash da Transação
+            //Data Obtained Through Transaction Hash
+            provider.getTransaction(block.transactions[0]).then((receipt) => {
+                console.log("From: ", receipt.from);
+                console.log("To: ", receipt.to);
+                console.log("Value: ", receipt.value);
+                console.log("Data Obtained Through Transaction Hash:", receipt); //All Data Obtained Through Transaction Hash
 
-            var array2 = {
-            date: time,
-            //type: transaction_type,
-            from: receipt.from,
-            to: receipt.to,
-            value: receipt.value + " ETH",
-            //status: transaction_status,
-            };
-            var text = "";
+                var array = {
+                date: time,
+                //type: transaction_type,
+                from: receipt.from,
+                to: receipt.to,
+                value: receipt.value + " ETH",
+                //status: transaction_status,
+                };
+                var text = "";
 
-            text += `<tr>
-                        <td class="center">${array2.date}</td>
-                        //<td class="center">${array2.type}</td>
-                        <td class="center">${array2.from}</td>
-                        <td class="center">${array2.to}</td>
-                        <td class="center">${array2.value}</td>
-                        //<td class="center">${array2.status}</td>
-                    </tr>`;
+                text += `<tr>
+                            <td class="center">${array.date}</td>
+                            //<td class="center">${array.type}</td>
+                            <td class="center">${array.from}</td>
+                            <td class="center">${array.to}</td>
+                            <td class="center">${array.value}</td>
+                            //<td class="center">${array.status}</td>
+                        </tr>`;
 
-            document.getElementById("historicTable").innerHTML =
-            `<table style="margin-bottom: 0px">
-                <tbody>
-                <tr>
-                    <th class="center">Date</th>
-                    //<th class="center">Type</th>
-                    <th class="center">From</th>
-                    <th class="center">To</th>
-                    <th class="center">Value</th>
-                    //<th class="center">Status</th>
-                </tr>` +
-            text +
-            `</tbody>
-            </table>`;
-        });
+                document.getElementById("historicTable").innerHTML =
+                `<table style="margin-bottom: 0px">
+                    <tbody>
+                        <tr>
+                            <th class="center">Date</th>
+                            //<th class="center">Type</th>
+                            <th class="center">From</th>
+                            <th class="center">To</th>
+                            <th class="center">Value</th>
+                            //<th class="center">Status</th>
+                        </tr>` +
+                        text +
+                    `</tbody>
+                </table>`;
+            });
         });
         */
     }

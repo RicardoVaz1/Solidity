@@ -1,6 +1,7 @@
 # Solidity:
 
-- [Exercises](/Exercises)
-- [Crypto Subscription](/Crypto%20Subscription)
-- [react-dapp](/react-dapp)
+- [Exercises](/exercises)
+- [Crypto Subscription](/crypto-subscription)
+- [React DApp](/react-dapp)
 - [Smart Contracts](/Smart%20Contracts)
+  - [DApp](/Smart%20Contracts/dapp)

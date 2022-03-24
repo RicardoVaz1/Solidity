@@ -1,0 +1,39 @@
+client:
+- create folder: yarn create next-app -e with-tailwindcss client
+- to run it: yarn dev
+- can use "rafce"+tab on the components to create a React Arrow Function Component
+- add react-icons: yarn add react-icons
+- install ethers: yarn add ethers
+- install sanity/client: yarn add @sanity/client
+- install react-modal: yarn add react-modal
+- install libraries: yarn add @emotion/react
+- install libraries: yarn add react-spinners
+- deploy the app (client folder): vercel
+    -> Set up and deploy? y
+    -> ...
+    -> Want to override the settings? n
+ 
+
+
+smart_contract:
+- install hardhat: npx hardhat
+- "Create a basic simple project"
+- compile the smart contract: npx hardhat compile
+- hardhat.config.js: define rinkeby network (networkURL and walletPrivateKey) > View key (HTTP)
+    networkURL -> Alchemy API > Create account > Create app (rinkeby network)
+    walletPrivateKey -> MetaMask wallet
+- deploy the script: npx hardhat run scripts/deploy.js --network rinkeby
+
+
+studio:
+- install: npm install -g @sanity/cli
+- bonus: sanity init --coupon cleverprogrammer
+- (optional) give permissions to this folder: sudo chmod -R 777 studio/
+- to run it: sanity start
+- get a token API: go to project on Sanity project and create a Token (permissions Editor) and copy it, and copy projectID
+- after app deploy (go to project API) and paste the link of deployed app (https://name-of-app-deployed.versel.app/)
+
+
+browser console:
+- window.ethereum
+- window.ethereum.isMetaMask

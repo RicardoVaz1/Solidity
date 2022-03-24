@@ -1,0 +1,35 @@
+#wrapper {
+    color: #ffffff; 
+    display: flex; 
+    flex-direction: column; 
+    width: 100vw; 
+    max-height: 100vh; 
+    user-select: none; 
+    height: 60vh;
+}
+
+nav {
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    flex-grow: 0.5
+}
+
+#historic {
+    padding: 1rem;
+    color: black;
+}
+
+table {
+    width: 100%;
+    font-family: arial, sans-serif;
+    text-align: center;
+}
+
+td {
+    border: 1px solid black;
+}
+
+#historic_header td {
+    font-weight: bold;
+}

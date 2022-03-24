@@ -1,0 +1,33 @@
+Tutorial: https://youtu.be/bdXJmWajZRY?t=878
+Openzeppelin: https://forum.openzeppelin.com/t/openzeppelin-upgrades-step-by-step-tutorial-for-hardhat/3580
+ 
+- Create hardhat project: npx hardhat (basic simple project)
+- Add library upgrades: yarn add @openzeppelin/hardhat-upgrades
+- Add library ethers: yarn add @nomiclabs/hardhat-ethers ethers
+- Add library .env: yarn add dotenv
+
+- Test the project: npx hardhat test
+
+- Deploy MainContract: npx hardhat run scripts/deploy.js
+- Compile MainContract: npx hardhat console --network rinkeby
+    > const MainContract = await ethers.getContractFactory("MainContract")
+    > const maincontract = await MainContract.attach("Address_TransparentUpgradeableProxy")
+    > (await maincontract.getCounter()).toString()
+
+
+(optional) Openzeppelin Gnosis Safe - allows users to store ether and ERC20 tokens securely and interact with the decentralized web
+                                    - has multi-signature feature, which allows it so that if one person gets compromised, 
+                                      the whole application ins't compromised
+                To upgrade the contract first we deploy the new contract, 
+                and then in the Gnosis Safe UI we actually upgrade it 
+                to that deployed new implementation
+
+
+
+- Deploy MainContractV2: npx hardhat run scripts/upgrade.js
+- Compile MainContractV2: npx hardhat console
+    > const MainContractV2 = await ethers.getContractFactory("MainContractV2")
+    > const maincontractV2 = await MainContractV2.attach("Address_TransparentUpgradeableProxy")
+    > (await maincontractV2.getCounter()).toString()
+    > await maincontractV2.incrementCounter()
+    > (await maincontractV2.getCounter()).toString()

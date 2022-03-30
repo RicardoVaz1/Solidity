@@ -1,9 +1,9 @@
 # generateContracts:
 
 - [Contracts](/generateContracts/contracts)
-    - [MainContract](/generateContracts/mainContract.sol)
-    - [MerchantContract](/generateContracts/merchantContract.sol)
-    - [Libraries](/generateContracts/Libraries.sol)
+    - [MainContract](/generateContracts/contracts/mainContract.sol)
+    - [MerchantContract](/generateContracts/contracts/merchantContract.sol)
+    - [Libraries](/generateContracts/contracts/Libraries.sol)
 
 - [Scripts](/generateContracts/scripts)
     - To deploy MainContract: **npx hardhat run scripts/deploy.js**

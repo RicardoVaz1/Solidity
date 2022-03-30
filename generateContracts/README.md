@@ -1,11 +1,11 @@
 # generateContracts:
 
 - [Contracts](/generateContracts/contracts)
-    - [MainContract](/mainContract.sol)
-    - [MerchantContract](/merchantContract.sol)
-    - [Libraries](/Libraries.sol)
+    - [MainContract](/generateContracts/mainContract.sol)
+    - [MerchantContract](/generateContracts/merchantContract.sol)
+    - [Libraries](/generateContracts/Libraries.sol)
 
-- [Scripts](/scripts)
+- [Scripts](/generateContracts/scripts)
     - To deploy MainContract: **npx hardhat run scripts/deploy.js**
     - Compile MainContract: **npx hardhat console --network rinkeby**
         > const MainContract = await ethers.getContractFactory("MainContract")
@@ -16,5 +16,5 @@
         > const MainContractV2 = await ethers.getContractFactory("MainContractV2")
         > const maincontractV2 = await MainContractV2.attach("Address_TransparentUpgradeableProxy")
 
-- [Test](/test)
+- [Test](/generateContracts/test)
     - To test use: **npx hardhat test**

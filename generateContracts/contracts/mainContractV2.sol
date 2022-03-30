@@ -1,37 +1,46 @@
 // "SPDX-License-Identifier: UNLICENSED"
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 import "./Libraries.sol";
 import "./merchantContract.sol";
 import "hardhat/console.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract MainContractV2 {
+
+contract MainContractV2 is Initializable {
     // VARIABLES
-    using SafeMath for uint256;
     using Address for address payable;
     
 
     /* ----- SYSTEM ----- */
+    bool private initialized; // To prevent this contract from being initialized multiple times
+    
     address private owner_address; // Owner of DApp (could be a DAO)
 
-    uint public version;
-    bool public system_state; // true = paused; false = unpased
-    //address public implementation;
+    bool public paused; // true = paused; false = unpaused
 
-    event PausedSystem(uint256 DATE, bool SYSTEM_STATE); // true = paused; false = unpased
-    event UnpausedSystem(uint256 DATE, bool SYSTEM_STATE);
-    event OwnershipTransferred(uint256 DATE, address OWNER_ADDRESS, address NEW_OWNER);
-    //event Upgrade(uint256 DATE, uint VERSION, address ADDRESS);
+    event PausedSystem(uint256 Date, bool System_State); // true = paused; false = unpaused
+    event OwnershipTransferred(uint256 Date, address Owner_Address, address New_Owner);
 
+
+    function _only0wner() private view {
+        // This way we reduce Solidity code size
+        require(msg.sender == owner_address, "Only Owner can call this function");
+    }
+
+    function _systemState() private view {
+        // This way we reduce Solidity code size
+        require(paused == false, "The system is Paused!");
+    }
 
     modifier onlyOwner() {
-        require(msg.sender == owner_address, "Only Owner can call this function");
+        _only0wner();
         _;
     }
 
     modifier systemState() {
-        require(system_state == false, "The system is Paused!");
+        _systemState();
         _;
     }
     /* ------------------ */
@@ -44,72 +53,86 @@ contract MainContractV2 {
     mapping (uint => address) merchantsAccounts_Addresses;
     mapping (address => uint256) merchantsAccounts_Balances;
     mapping (address => string) merchantsAccounts_Names;
-    mapping (address => bool) merchantsAccounts_States; // true = paused; false = unpased
+    mapping (address => bool) merchantsAccounts_States; // true = paused; false = unpaused
     uint256 merchantsAccounts_Counter;
     
-    event PausedMerchant(uint256 DATE, address MERCHANT_ADDRESS, bool SYSTEM_STATE); // true = paused; false = unpased
-    event UnpausedMerchant(uint256 DATE, address MERCHANT_ADDRESS, bool SYSTEM_STATE);
-    event RemovedMerchant(uint256 DATE, address MERCHANT_ADDRESS);
-    event CreateMerchantContract(uint256 DATE, address MERCHANT_ADDRESS, uint MERCHANT_BALANCE, string MERCHANT_NAME, bool MERCHANT_STATE);
+    event PausedMerchant(uint256 Date, address Merchant_Address, bool System_State); // true = paused; false = unpaused
+    event RemovedMerchant(uint256 Date, address Merchant_Address);
+    event CreateMerchantContract(uint256 Date, address Merchant_Address, uint Merchant_Balance, string Merchant_Name, bool Merchant_State);
     /* --------------------- */
-
 
 
 
     // FUNCTIONS
     /*constructor() {
         owner_address = msg.sender;
-        system_state = false;
-        version = 1.0;
+        paused = false;
         merchantsAccounts_Counter = 0;
     }*/
 
-    function initial(uint256 COUNTER) public {
+    function initialize(address admin) public initializer {
         // This function is only used for Upgrade Tests
         
-        owner_address = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
-        system_state = false;
-        version = 1;
-        merchantsAccounts_Counter = COUNTER;
+        require(!initialized, "Contract instance has already been initialized"); // To prevent this contract from being initialized multiple times
+        initialized = true;
+
+        owner_address = admin;
+        paused = false;
+        merchantsAccounts_Counter = 0;
     }
-
-    function getCounter() view public returns(uint256) {
-        // This function is only used for Upgrade Tests
-
-        console.log("Counter: ", merchantsAccounts_Counter);
-        return merchantsAccounts_Counter;
-    }
-
-    function incrementCounter() public {
-        // This function is only used for Upgrade Tests
-
-        merchantsAccounts_Counter += 1;
-        console.log("Counter: ", merchantsAccounts_Counter);
-    }
+    
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() initializer {}
 
 
 
     /* ----- SYSTEM ----- */
-    function getOwnerAddress() onlyOwner view public returns(address) {        
+    function getOwnerAddress() view public returns(address) {
+        // require(msg.sender == owner_address, "Only Owner can call this function");
+        // If we uncomment the previous line (or add the "onlyOwner" modifier) when we tried to call the function from Hardhat console it won't work
+
+        console.log("Owner Address: ", owner_address);
+        return owner_address;
+    }
+
+    function getOwnerAddress2() onlyOwner view public returns(address) {
         console.log("Owner Address: ", owner_address);
         return owner_address;
     }
 
     function pauseSystem() public onlyOwner {
-        system_state = true;
+        paused = true;
+
+        // Pause All Merchants
+        for(uint i = 0; i < merchantsAccounts_Counter; i++) {
+            merchantsAccounts_States[merchantsAccounts_Addresses[i]] = paused;
+            merchant.pauseMerchant(msg.sender);
+            console.log("Merchant ", i+1, " Paused: ", merchantsAccounts_Addresses[i]);
+            console.log("\n");
+        }
+        
         console.log("System is paused!");
-        emit PausedSystem(block.timestamp, system_state);
+        emit PausedSystem(block.timestamp, paused);
     }
 
     function unpauseSystem() public onlyOwner {
-        system_state = false;
+        paused = false;
+
+        // Unpause All Merchants
+        for(uint i = 0; i < merchantsAccounts_Counter; i++) {
+            merchantsAccounts_States[merchantsAccounts_Addresses[i]] = paused;
+            merchant.pauseMerchant(msg.sender);
+            console.log("Merchant ", i+1, " Unpaused: ", merchantsAccounts_Addresses[i]);
+            console.log("\n");
+        }
+
         console.log("System is unpaused!");
-        emit UnpausedSystem(block.timestamp, system_state);
+        emit PausedSystem(block.timestamp, paused);
     }
 
-    function transferOwnership(address NEW_OWNER) public virtual onlyOwner systemState {
-        emit OwnershipTransferred(block.timestamp, owner_address, NEW_OWNER);
-        owner_address = NEW_OWNER;
+    function transferOwnership(address New_Owner) public virtual onlyOwner systemState {
+        emit OwnershipTransferred(block.timestamp, owner_address, New_Owner);
+        owner_address = New_Owner;
         console.log("New Owner address is: ", owner_address);
     }
 
@@ -118,89 +141,78 @@ contract MainContractV2 {
         owner_address = address(0);
         console.log("Owner doesn't exist anymore!");
     }
-
-    /*function upgradeSystem(address NEW_ADDRESS) public virtual onlyOwner systemState {
-        version += 1;
-        implementation = NEW_ADDRESS;
-        emit Upgrade(block.timestamp, version, implementation);
-        
-        console.log("System Upgraded");
-        console.log("Version: ", version);
-        console.log("Address: ", NEW_ADDRESS);
-        
-        Link: https://www.youtube.com/watch?v=bdXJmWajZRY
-    }*/
     /* ------------------ */
 
 
 
 
     /* ----- MERCHANTs ----- */
-    function pauseMerchant(address MERCHANT_ADDRESS) public virtual onlyOwner systemState {
+    function pauseMerchant(address Merchant_Address) public virtual onlyOwner systemState {
         for(uint i = 0; i < merchantsAccounts_Counter; i++) {
-            if(MERCHANT_ADDRESS == merchantsAccounts_Addresses[i]) {
-                merchantsAccounts_States[MERCHANT_ADDRESS] = true;
-                merchant.pauseMerchant(owner_address);
-                console.log("Merchant Paused: ", MERCHANT_ADDRESS);
+            if(Merchant_Address == merchantsAccounts_Addresses[i]) {
+                merchantsAccounts_States[Merchant_Address] = true;
+                merchant.pauseMerchant(msg.sender);
+                console.log("Merchant Paused: ", Merchant_Address);
                 return;
             }
         }
-        console.log("This Address doen't exists in the system!");
-        emit PausedMerchant(block.timestamp, MERCHANT_ADDRESS, true);
+        console.log("This Address doesn't exists in the system!");
+        emit PausedMerchant(block.timestamp, Merchant_Address, true);
     }
 
-    function unpauseMerchant(address MERCHANT_ADDRESS) public virtual onlyOwner systemState {
+    function unpauseMerchant(address Merchant_Address) public virtual onlyOwner systemState {
         for(uint i = 0; i < merchantsAccounts_Counter; i++) {
-            if(MERCHANT_ADDRESS == merchantsAccounts_Addresses[i]) {
-                merchantsAccounts_States[MERCHANT_ADDRESS] = false;
-                merchant.unpauseMerchant(owner_address);
-                console.log("Merchant Unpaused: ", MERCHANT_ADDRESS);
+            if(Merchant_Address == merchantsAccounts_Addresses[i]) {
+                merchantsAccounts_States[Merchant_Address] = false;
+                merchant.unpauseMerchant(msg.sender);
+                console.log("Merchant Unpaused: ", Merchant_Address);
                 return;
             }
         }
-        console.log("This Address doen't exists in the system!");
-        emit UnpausedMerchant(block.timestamp, MERCHANT_ADDRESS, false);
+        console.log("This Address doesn't exists in the system!");
+        emit PausedMerchant(block.timestamp, Merchant_Address, false);
     }
 
-    function removeMerchant(address MERCHANT_ADDRESS) public virtual onlyOwner systemState {
+    function removeMerchant(address Merchant_Address) public virtual onlyOwner systemState {
         for(uint i = 0; i < merchantsAccounts_Counter; i++) {
-            if(MERCHANT_ADDRESS == merchantsAccounts_Addresses[i]) {
+            if(Merchant_Address == merchantsAccounts_Addresses[i]) {
+                merchant.pauseMerchant(msg.sender);
                 delete merchantsAccounts_Addresses[i];
-                merchant.deleteMerchant(owner_address);
-                console.log("Merchant Removed: ", MERCHANT_ADDRESS);
+                merchant.deleteMerchant(msg.sender);
+                console.log("Merchant Removed: ", Merchant_Address);
                 return;
             }
         }
-        console.log("This Address doen't exists in the system!");
-        emit RemovedMerchant(block.timestamp, MERCHANT_ADDRESS);
+        console.log("This Address doesn't exists in the system!");
+        emit RemovedMerchant(block.timestamp, Merchant_Address);
     }
 
-    function addMerchant(address MERCHANT_ADDRESS, uint256 MERCHANT_BALANCE, string memory MERCHANT_NAME) public onlyOwner systemState {
-        require(MERCHANT_ADDRESS != owner_address, "That's the Owner Address!");
+    function addMerchant(address Merchant_Address, uint256 Merchant_Balance, string memory Merchant_Name) public onlyOwner systemState {
+        require(Merchant_Address != owner_address, "That's the Owner Address!");
 
-        if(verifyMerchantAddress(MERCHANT_ADDRESS) != true) return;
+        if(verifyMerchantAddress(Merchant_Address) != true) return;
 
-        merchant = new MerchantContract(owner_address, MERCHANT_ADDRESS, MERCHANT_BALANCE, MERCHANT_NAME, false);
+        merchant = new MerchantContract(owner_address, Merchant_Address, Merchant_Balance, Merchant_Name, false);
         
-        merchantsAccounts_Addresses[merchantsAccounts_Counter] = MERCHANT_ADDRESS;
-        merchantsAccounts_Balances[MERCHANT_ADDRESS] = MERCHANT_BALANCE;
-        merchantsAccounts_Names[MERCHANT_ADDRESS] = MERCHANT_NAME;
-        merchantsAccounts_States[MERCHANT_ADDRESS] = false;
+        merchantsAccounts_Addresses[merchantsAccounts_Counter] = Merchant_Address;
+        merchantsAccounts_Balances[Merchant_Address] = Merchant_Balance;
+        merchantsAccounts_Names[Merchant_Address] = Merchant_Name;
+        merchantsAccounts_States[Merchant_Address] = false;
 
         console.log("Created new Merchant!");
-        console.log("Address: ", MERCHANT_ADDRESS);
-        console.log("Address: ", MERCHANT_BALANCE);
-        console.log("Name: ", MERCHANT_NAME);
+        console.log("Address: ", Merchant_Address);
+        console.log("Address: ", Merchant_Balance);
+        console.log("Name: ", Merchant_Name);
         console.log("State: Unpaused");
         
         merchantsAccounts_Counter += 1;
 
-        emit CreateMerchantContract(block.timestamp, MERCHANT_ADDRESS, MERCHANT_BALANCE, MERCHANT_NAME, false);        
+        emit CreateMerchantContract(block.timestamp, Merchant_Address, Merchant_Balance, Merchant_Name, false);        
     }
 
-    function verifyMerchantAddress(address MERCHANT_ADDRESS) view private returns(bool) {
+    function verifyMerchantAddress(address Merchant_Address) view private returns(bool) {
         for(uint i = 0; i < merchantsAccounts_Counter; i++) {
-            if(MERCHANT_ADDRESS == merchantsAccounts_Addresses[i]) {
+            if(Merchant_Address == merchantsAccounts_Addresses[i]) {
                 console.log("This Address already exists in the system!");
                 return false;
             }
@@ -209,7 +221,7 @@ contract MainContractV2 {
         return true;
     }
 
-    function getAllMerchantsInfo() view public onlyOwner systemState {
+    function getAllMerchantsInfo() view public onlyOwner {
         console.log("Total of Merchants: ", merchantsAccounts_Counter);
         console.log("\n");
         
@@ -223,11 +235,11 @@ contract MainContractV2 {
         }
     }
 
-    function balanceOf(address ACCOUNT_ADDRESS) public view onlyOwner systemState returns (uint256) {
-        console.log("Account: ", ACCOUNT_ADDRESS);
-        console.log("Balance: ", merchantsAccounts_Balances[ACCOUNT_ADDRESS]);
+    function balanceOf(address Account_Address) public view onlyOwner systemState returns (uint256) {
+        console.log("Account: ", Account_Address);
+        console.log("Balance: ", merchantsAccounts_Balances[Account_Address]);
 
-        return merchantsAccounts_Balances[ACCOUNT_ADDRESS];
+        return merchantsAccounts_Balances[Account_Address];
     }
     /* --------------------- */
 }

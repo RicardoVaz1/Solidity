@@ -5,6 +5,7 @@ Openzeppelin: https://forum.openzeppelin.com/t/openzeppelin-upgrades-step-by-ste
 - Add library upgrades: yarn add @openzeppelin/hardhat-upgrades
 - Add library ethers: yarn add @nomiclabs/hardhat-ethers ethers
 - Add library .env: yarn add dotenv
+- Add library contracts-upgradeable: yarn add @openzeppelin/contracts-upgradeable
 
 - Test the project: npx hardhat test
 
@@ -12,7 +13,8 @@ Openzeppelin: https://forum.openzeppelin.com/t/openzeppelin-upgrades-step-by-ste
 - Compile MainContract: npx hardhat console --network rinkeby
     > const MainContract = await ethers.getContractFactory("MainContract")
     > const maincontract = await MainContract.attach("Address_TransparentUpgradeableProxy")
-    > (await maincontract.getCounter()).toString()
+    > (await maincontract.getCounter()).toString() <-- Doesn't exist anymore
+    > (await maincontract.getOwnerAddress()).toString()
 
 
 (optional) Openzeppelin Gnosis Safe - allows users to store ether and ERC20 tokens securely and interact with the decentralized web
@@ -28,6 +30,9 @@ Openzeppelin: https://forum.openzeppelin.com/t/openzeppelin-upgrades-step-by-ste
 - Compile MainContractV2: npx hardhat console
     > const MainContractV2 = await ethers.getContractFactory("MainContractV2")
     > const maincontractV2 = await MainContractV2.attach("Address_TransparentUpgradeableProxy")
+
+    > (await maincontractV2.getCounter()).toString() <-- Doesn't exist anymore
+    > await maincontractV2.incrementCounter() <-- Doesn't exist anymore
     > (await maincontractV2.getCounter()).toString()
-    > await maincontractV2.incrementCounter()
-    > (await maincontractV2.getCounter()).toString()
+
+    > (await maincontractV2.getOwnerAddress2()).toString()

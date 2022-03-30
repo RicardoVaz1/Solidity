@@ -1,21 +1,20 @@
 const { expect } = require("chai");
+require("dotenv").config();
 
 let MainContract
 let maincontract
 
-// var OWNER_ADDRESS = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4
-// var SYSTEM_STATE = false
-// var VERSION = 1
-// var COUNTER = 0
 
 describe("mainContract (proxy)", function () {
   beforeEach(async function () {
     MainContract = await ethers.getContractFactory("MainContract")
-    maincontract = await upgrades.deployProxy(MainContract, [0], { initializer: 'initial' })
+    maincontract = await upgrades.deployProxy(MainContract, [process.env.OWNER_ADDRESS], { initializer: 'initialize' })
   })
+  
 
   // Test case
-  it("getCounter returns the Counter previously initialized", async function () {
-    expect((await maincontract.getCounter()).toString()).to.equal('0');
+  it("getOwnerAddress returns the OwnerAddress previously initialized", async function () {
+    // expect(await maincontract.getOwnerAddress())
+    expect((await maincontract.getOwnerAddress()).toString()).to.equal(process.env.OWNER_ADDRESS);
   });
 });

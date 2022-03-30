@@ -20,19 +20,19 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 
-const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL
-const PRIVATE_KEY = process.env.PRIVATE_KEY
-
 module.exports = {
   solidity: "0.8.4",
+  settings: {
+    optimizer: {
+      enabled: true,
+      runs: 200
+    }
+  },
   defaultNetwork: "rinkeby",
   networks: {
     rinkeby: {
-      url: RINKEBY_RPC_URL,
-      accounts: [PRIVATE_KEY]
+      url: process.env.RINKEBY_RPC_URL,
+      accounts: [process.env.PRIVATE_KEY]
     }
   }
 };
-
-// console.log("RINKEBY_RPC_URL: ", RINKEBY_RPC_URL)
-// console.log("PRIVATE_KEY: ", PRIVATE_KEY)

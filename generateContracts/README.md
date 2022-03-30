@@ -1,15 +1,20 @@
-# Basic Sample Hardhat Project
+# generateContracts:
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+- [Contracts](/contracts)
+    - [MainContract](/mainContract.sol)
+    - [MerchantContract](/merchantContract.sol)
+    - [Libraries](/Libraries.sol)
 
-Try running some of the following tasks:
+- [Scripts](/scripts)
+    - To deploy MainContract: **npx hardhat run scripts/deploy.js**
+    - Compile MainContract: **npx hardhat console --network rinkeby**
+        > const MainContract = await ethers.getContractFactory("MainContract")
+        > const maincontract = await MainContract.attach("Address_TransparentUpgradeableProxy")
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-```
+    - To deploy MainContractV2: **npx hardhat run scripts/upgrade.js**
+    - Compile MainContractV2: **npx hardhat console**
+        > const MainContractV2 = await ethers.getContractFactory("MainContractV2")
+        > const maincontractV2 = await MainContractV2.attach("Address_TransparentUpgradeableProxy")
+
+- [Test](/test)
+    - To test use: **npx hardhat test**

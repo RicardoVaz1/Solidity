@@ -1,6 +1,6 @@
 # generateContracts:
 
-- [Contracts](/contracts)
+- [Contracts](/generateContracts/contracts)
     - [MainContract](/mainContract.sol)
     - [MerchantContract](/merchantContract.sol)
     - [Libraries](/Libraries.sol)

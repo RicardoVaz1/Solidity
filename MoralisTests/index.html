@@ -19,7 +19,7 @@
                 console.log("Date: " + inf[0].attributes.block_timestamp)
             }
 
-            async function getInfvByDate() {
+            async function getInfByDate() {
                 const query_date = "2022-04-11T11:15:20.000Z"   // ("Mon Apr 11 2022 12:15:20 GMT+0100 (Western European Summer Time)")
                 const inf = await Moralis.Cloud.run("transactions?date="+query_date)
                 console.log(inf)
@@ -27,7 +27,7 @@
             }
             
             getInfByID()
-            getInfvByDate()
+            getInfByDate()
         </script>
     </body>
 </html>

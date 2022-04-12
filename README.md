@@ -5,3 +5,5 @@
 - [React DApp](/react-dapp)
 - [DApp 2.0](/dapp_2.0)
 - [Generate Contracts](/generateContracts)
+- [Moralis Tests](/MoralisTests)
+

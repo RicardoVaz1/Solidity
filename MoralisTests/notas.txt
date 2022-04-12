@@ -1,0 +1,3 @@
+To configure Moralis:
+- sudo npm install -g moralis-admin-cli
+- sudo moralis-admin-cli watch-cloud-folder --moralisApiKey [moralisApiKey] --moralisApiSecret [moralisApiSecret] --moralisSubdomain [moralisSubdomain] --autoSave 1 --moralisCloudfolder [moralisCloudfolder]

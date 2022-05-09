@@ -7,7 +7,7 @@ Openzeppelin: https://forum.openzeppelin.com/t/openzeppelin-upgrades-step-by-ste
 - Add library .env: yarn add dotenv
 - Add library contracts-upgradeable: yarn add @openzeppelin/contracts-upgradeable
 
-- Test the project: npx hardhat test
+- Test the project: npx hardhat test OR npm test
 
 - Deploy MainContract: npx hardhat run scripts/deploy.js
 - Compile MainContract: npx hardhat console --network rinkeby

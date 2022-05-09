@@ -4,31 +4,32 @@
 import { contractABI, contractAddress } from '../lib/constants'
 import { ethers } from 'ethers'
 require("dotenv").config();
+var Web3 = require('web3');
 
 const axios = require('axios');
 
 async function convertToETH(total, currency) {
+    let response = null;
     try {
         if(currency == "€") currency = "EUR"
         if(currency == "$") currency = "USD"
-        
+
         response = await axios.get('https://pro-api.coinmarketcap.com/v2/tools/price-conversion?amount='+total+'&symbol='+currency+'&convert=ETH',
-            { headers: { 'X-CMC_PRO_API_KEY': process.env.API_KEY } });
-
-        var inf = response.data;
-
-        var ETH_price = await inf.data[0].quote.ETH.price;
-        var timestamp = await new Date(inf.data[0].quote.ETH.last_updated)
-        //var date = timestamp.toISOString().split('T')[0].split("-").reverse().join("-")
-        //var time = [timestamp.getHours(), timestamp.getMinutes(), timestamp.getSeconds()].join(":")
-        var date1 = await timestamp.toLocaleString('pt-PT');
-
-        console.log("On " + date1 + " the amount " + total + " " + currency + " is " + ETH_price+" ETH")
-
-        return ETH_price;
+        { headers: { 'X-CMC_PRO_API_KEY': process.env.PRO_API_KEY } });
 
     } catch(error) {
         console.log(error);
+    }
+    if (response) {      
+        var inf = response.data;
+        // console.log(inf)
+
+        var ETH_price = inf.data[0].quote.ETH.price;
+        var timestamp = new Date(inf.data[0].quote.ETH.last_updated)
+        var date = timestamp.toLocaleString('pt-PT');
+        console.log("On " + date + " -> " + total + " " + currency + " = " + ETH_price+" ETH")
+
+        return ETH_price;
     }
 }
 
@@ -78,14 +79,14 @@ const snippetData = async function payWithCrypto(total, currency) {
         const accounts = await metamask.request({ method: 'eth_requestAccounts' })
         const BuyerAddress = accounts[0]
 
+        const amount = convertToETH(total, currency)
+        const parsedAmount = ethers.utils.parseEther(amount)
 
+        /*
         const provider = new ethers.providers.Web3Provider(ethereum)
         const signer = provider.getSigner()
         const transactionContract = new ethers.Contract(contractAddress, contractABI, signer)
-
-        const amount = convertToETH(total, currency) // amountEUR/3235  -->  1 ETH = 3235 EUR
-        const parsedAmount = ethers.utils.parseEther(amount)
-
+        
         await metamask.request({
             method: 'eth_sendTransaction',
             params: [
@@ -103,10 +104,23 @@ const snippetData = async function payWithCrypto(total, currency) {
             MerchantAddress,
             parsedAmount,
             `Transferring ${parsedAmount} ETH from ${BuyerAddress} to ${MerchantAddress}`
-        )
-    
-        await transactionHash.wait()
+        )*/
 
+        var web3 = new Web3(web3.currentProvider);
+        let myContract = new web3.eth.Contract(contractABI, contractAddress);
+        // let amount = 1;
+        // amount = web3.utils.toWei(amount.toString(), 'ether');
+        let response = await myContract.methods
+            .buy(BuyerAddress, parsedAmount)  //function in contract
+            .send({
+                from: window.web3.currentProvider.selectedAddress,
+                to: MerchantAddress,
+                value: parsedAmount._hex,
+                gasPrice: '20000000000'
+            });
+        console.log("response: ", response);
+
+        await transactionHash.wait()
         await saveTransaction(transactionHash, amount, BuyerAddress, MerchantAddress)
 
     } catch (error) {

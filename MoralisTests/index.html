@@ -8,26 +8,57 @@
     <body>
         Check the Console tab!
         <script>
-            // require("dotenv").config();
             Moralis.initialize('UZSqeVQoEaE8T6ZJ2XKCdOcaVAPtDqpmLT39szsD'); // Application id from moralis
             Moralis.serverURL = 'https://pvvnotm4bih1.usemoralis.com:2053/server'; //Server url from moralis
             
-            async function getInfByID() {
-                const query_id = "1id5SR1vqy68wzGHHb7oFYSe"
-                const inf = await Moralis.Cloud.run("cryptopunks?id="+query_id)
-                console.log(inf)
-                console.log("Date: " + inf[0].attributes.block_timestamp)
+            async function getInfByID(query_id) {
+                try {
+                    const inf = await Moralis.Cloud.run("cryptopunks?id="+query_id)
+                    console.log("Inf: ", inf)
+                    console.log("Date: " + inf[0].attributes.block_timestamp)
+                }
+                catch(error) {
+                    console.log("Error: ", error)
+                }
             }
 
-            async function getInfByDate() {
-                const query_date = "2022-04-11T11:15:20.000Z"   // ("Mon Apr 11 2022 12:15:20 GMT+0100 (Western European Summer Time)")
-                const inf = await Moralis.Cloud.run("transactions?date="+query_date)
-                console.log(inf)
-                console.log("Date: " + inf[0].attributes.block_timestamp)
+            async function getInfByDate(query_date) {
+                try {                    
+                    var dateISO = new Date(query_date).toISOString()
+                    console.log("date: ", dateISO)
+
+                    const inf = await Moralis.Cloud.run("transaction-by-date?date="+dateISO)
+                    console.log("Info: ", inf)
+                    console.log("Date: " + inf[0].attributes.block_timestamp)
+                }
+                catch(error) {
+                    console.log("Error: ", error)
+                }
             }
+
+            async function getTransactionsByDate(query_date) {
+                try {                    
+                    var dateISO = new Date(query_date).toISOString()
+                    console.log("date: ", dateISO)
+
+                    const inf = await Moralis.Cloud.run("transactions-by-date?date="+dateISO)
+                    console.log("Information: ", inf)
+                }
+                catch(error) {
+                    console.log("Error: ", error)
+                }
+            }
+
+
             
-            getInfByID()
-            getInfByDate()
+            const id = "1id5SR1vqy68wzGHHb7oFYSe"
+            // const date = "2022-04-11T11:15:20.000Z"
+            // const date = "Mon Apr 11 2022 12:15:20 GMT+0100 (Western European Summer Time)"
+            const date = "Apr 11 2022 12:15:20"
+
+            getInfByID(id)
+            getInfByDate(date)
+            getTransactionsByDate(date)
         </script>
     </body>
 </html>

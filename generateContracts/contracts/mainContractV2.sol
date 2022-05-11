@@ -39,7 +39,7 @@ contract MainContractV2 is Initializable {
 
 
     /* ========== MERCHANTs ========== */
-    uint merchantsCounter;
+    uint public merchantsCounter;
     mapping (uint => MerchantContract) public MerchantContracts;
 
 
@@ -77,14 +77,25 @@ contract MainContractV2 is Initializable {
         return x;
     }
 
+    function updateMerchantContracts(bool Pause) private {
+        console.log("Pause: ", Pause);
+
+        // Upadate All MerchantContracts
+        for(uint i = 1; i <= merchantsCounter; i++) {
+            if(Pause == true) {
+                MerchantContracts[i].pauseMerchant();
+                console.log("MerchantContract ", address(MerchantContracts[i]), " paused!\n");    
+            }
+            else {
+                MerchantContracts[i].unpauseMerchant();
+                console.log("MerchantContract ", address(MerchantContracts[i]), " paused!\n");    
+            }
+        }
+    }
+
     function pauseSystem() public onlyOwner {
         paused = true;
-
-        // Pause All Merchants
-        for(uint i = 0; i < merchantsCounter; i++) {
-            MerchantContracts[i].pauseMerchant();
-            // console.log("Merchant ", MerchantContracts[i], " Paused!\n");
-        }
+        updateMerchantContracts(paused);
         
         console.log("System is paused!");
         emit PausedSystem(paused);
@@ -92,24 +103,19 @@ contract MainContractV2 is Initializable {
 
     function unpauseSystem() public onlyOwner {
         paused = false;
-
-        // Unpause All Merchants
-        for(uint i = 0; i < merchantsCounter; i++) {
-            MerchantContracts[i].unpauseMerchant();
-            // console.log("Merchant ", MerchantContracts[i], " Unpaused!\n");
-        }
+        updateMerchantContracts(paused);
 
         console.log("System is unpaused!");
         emit PausedSystem(paused);
     }
 
-    function transferOwnership(address NewOwner) public virtual onlyOwner systemState {
+    function transferOwnership(address NewOwner) public onlyOwner systemState {
         emit OwnershipTransferred(owner_address, NewOwner);
         owner_address = NewOwner;
         console.log("New Owner address is: ", owner_address);
     }
 
-    function renounceOwnership() public virtual onlyOwner systemState {
+    function renounceOwnership() public onlyOwner systemState {
         emit OwnershipTransferred(owner_address, address(0));
         owner_address = address(0);
         console.log("Owner doesn't exist anymore!");
@@ -117,19 +123,11 @@ contract MainContractV2 is Initializable {
 
 
 
-    /* ========== MERCHANTs ========== */
-    function addMerchant(address MerchantAddress, string memory MerchantName) public onlyOwner systemState {
-        require(MerchantAddress != owner_address, "That's the Owner Address!");
-
-        bool merchant_exist;
-
-        for(uint i = 0; i < merchantsCounter; i++) {
-            if(MerchantAddress == MerchantContracts[i].getMerchantAddress()) {
-                merchant_exist = true;
-            }
-        }
-
-        if(merchant_exist == false) {
+    /* ========== MERCHANT_CONTRACTs ========== */
+    function addMerchantContract(address MerchantAddress, string memory MerchantName) public onlyOwner systemState {
+        // require(MerchantAddress != owner_address, "That's the Owner Address!");
+        
+        // if(MerchantContracts[merchantsCounter].verifyMerchantAddress(MerchantAddress) == false) {
             merchantsCounter++;
             MerchantContracts[merchantsCounter] = new MerchantContract(owner_address, MerchantAddress, MerchantName);
 
@@ -138,44 +136,44 @@ contract MainContractV2 is Initializable {
             console.log("Name: ", MerchantName);
 
             emit CreateMerchantContract(MerchantAddress, MerchantName);
-        }
-        else console.log("This Address already exists in the system!");
+        // }
+        // else console.log("This Address already exists in the system!");
     }
 
-    function getMerchantID(address MerchantAddress) private view returns(uint) {
+    function getMerchantContractID(address MerchantContractAddress) private view returns(uint) {
         uint id;
-        for(uint i = 0; i < merchantsCounter; i++) {
-            if(MerchantAddress == MerchantContracts[i].getMerchantAddress()) {
+        for(uint i = 0; i <= merchantsCounter; i++) {
+            if(MerchantContractAddress == address(MerchantContracts[i])) {
                 id = i;
             }
         }
         return id;
     }
 
-    function pauseMerchant(address MerchantAddress) public virtual onlyOwner systemState {
-        uint MerchantContractID = getMerchantID(MerchantAddress);
+    function pauseMerchantContract(address MerchantContractAddress) public onlyOwner systemState {
+        uint MerchantContractID = getMerchantContractID(MerchantContractAddress);
         MerchantContracts[MerchantContractID].pauseMerchant();
-        console.log("Merchant ", MerchantAddress, " Paused!");
-        emit PausedMerchant(MerchantAddress, true);
+        
+        console.log("MerchantContract ", MerchantContractAddress, " Paused!");
+        emit PausedMerchantContract(MerchantContractAddress, true);
     }
 
-    function unpauseMerchant(address MerchantAddress) public virtual onlyOwner systemState {
-        uint MerchantContractID = getMerchantID(MerchantAddress);
-        MerchantContracts[MerchantContractID].pauseMerchant();
-        console.log("Merchant ", MerchantAddress, " Unpaused!");
-        emit PausedMerchant(MerchantAddress, false);
+    function unpauseMerchantContract(address MerchantContractAddress) public onlyOwner systemState {
+        uint MerchantContractID = getMerchantContractID(MerchantContractAddress);
+        MerchantContracts[MerchantContractID].unpauseMerchant();
+        
+        console.log("MerchantContract ", MerchantContractAddress, " Unpaused!");
+        emit PausedMerchantContract(MerchantContractAddress, false);
     }
 
-    function removeMerchant(address MerchantAddress) public virtual onlyOwner systemState {
-        for(uint i = 0; i < merchantsCounter; i++) {
-            if(MerchantAddress == MerchantContracts[i].getMerchantAddress()) {
-                console.log("Merchant ", MerchantAddress, " Removed!");
-                emit RemovedMerchant(MerchantAddress);
-                
-                MerchantContracts[i].deleteMerchant();
-                delete MerchantContracts[i];
-            }
-        }        
+    function removeMerchantContract(address MerchantContractAddress) public onlyOwner systemState {
+        uint MerchantContractID = getMerchantContractID(MerchantContractAddress);
+        MerchantContracts[MerchantContractID].deleteMerchant();
+        delete MerchantContracts[MerchantContractID];
+        merchantsCounter--;
+
+        console.log("MerchantContract ", MerchantContractAddress, " Removed!");
+        emit RemovedMerchantContract(MerchantContractAddress);
     }
 
 
@@ -184,7 +182,7 @@ contract MainContractV2 is Initializable {
     event PausedSystem(bool SystemState); // true = paused; false = unpaused
     event OwnershipTransferred(address OwnerAddress, address NewOwner);
 
-    event CreateMerchantContract(address MerchantAddress, string MerchantName);
-    event PausedMerchant(address MerchantAddress, bool SystemState); // true = paused; false = unpaused
-    event RemovedMerchant(address MerchantAddress);
+    event CreateMerchantContract(address MerchantContractAddress, string MerchantName);
+    event PausedMerchantContract(address MerchantContractAddress, bool SystemState); // true = paused; false = unpaused
+    event RemovedMerchantContract(address MerchantContractAddress);
 }

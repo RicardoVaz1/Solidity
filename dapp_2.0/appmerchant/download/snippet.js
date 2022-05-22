@@ -1,7 +1,7 @@
 // const snippetData = "Hello world";
 // export default snippetData;
 
-import { contractABI, contractAddress } from '../lib/constants'
+import { MerchantContractABI, MerchantContractAddress } from '../lib/constants'
 import { ethers } from 'ethers'
 require("dotenv").config();
 var Web3 = require('web3');
@@ -34,7 +34,7 @@ async function convertToETH(total, currency) {
 }
 
 
-async function saveTransaction(transactionHash, amount, BuyerAddress, MerchantAddress) {
+/*async function saveTransaction(transactionHash, amount, BuyerAddress, MerchantAddress) {
     let response = null;
     let token = null;
 
@@ -60,7 +60,7 @@ async function saveTransaction(transactionHash, amount, BuyerAddress, MerchantAd
             alert("Done Successfully!")
         }
     }
-}
+}*/
 
 const snippetData = async function payWithCrypto(total, currency) {
     // total: is the amount in euro or dollar, currency: is the symbol EUR or USD
@@ -85,7 +85,7 @@ const snippetData = async function payWithCrypto(total, currency) {
         /*
         const provider = new ethers.providers.Web3Provider(ethereum)
         const signer = provider.getSigner()
-        const transactionContract = new ethers.Contract(contractAddress, contractABI, signer)
+        const transactionContract = new ethers.Contract(MerchantContractAddress, MerchantContractABI, signer)
         
         await metamask.request({
             method: 'eth_sendTransaction',
@@ -104,24 +104,42 @@ const snippetData = async function payWithCrypto(total, currency) {
             MerchantAddress,
             parsedAmount,
             `Transferring ${parsedAmount} ETH from ${BuyerAddress} to ${MerchantAddress}`
-        )*/
+        )
 
-        var web3 = new Web3(web3.currentProvider);
-        let myContract = new web3.eth.Contract(contractABI, contractAddress);
+        await transactionHash.wait()
+        await saveTransaction(transactionHash, amount, BuyerAddress, MerchantAddress)*/
+
+
+        /* ========== MERCHANT ========== */
+        var web3_Mechant = new Web3(MerchantAddress);
+        let MerchantContract = new web3_Mechant.eth.Contract(MerchantContractABI, MerchantContractAddress);
         // let amount = 1;
         // amount = web3.utils.toWei(amount.toString(), 'ether');
-        let response = await myContract.methods
-            .buy(BuyerAddress, parsedAmount)  //function in contract
+        let MerchantResponse = await MerchantContract.methods
+            .createPurchase(idPurchase, parsedAmount)
+            .send({
+                from: MerchantAddress,
+                to: MerchantContractAddress,
+                // value: parsedAmount._hex,
+                gasPrice: '20000000000'
+            });
+        console.log("Merchant response: ", MerchantResponse);
+
+
+        /* ========== BUYER ========== */
+        var web3_Buyer = new Web3(web3.currentProvider);
+        let _MerchantContract = new web3_Buyer.eth.Contract(MerchantContractABI, MerchantContractAddress);
+        // let amount = 1;
+        // amount = web3.utils.toWei(amount.toString(), 'ether');
+        let BuyerResponse = await _MerchantContract.methods
+            .buy(idPurchase, parsedAmount)
             .send({
                 from: window.web3.currentProvider.selectedAddress,
-                to: MerchantAddress,
+                to: MerchantContractAddress,
                 value: parsedAmount._hex,
                 gasPrice: '20000000000'
             });
-        console.log("response: ", response);
-
-        await transactionHash.wait()
-        await saveTransaction(transactionHash, amount, BuyerAddress, MerchantAddress)
+        console.log("Buyer response: ", BuyerResponse);
 
     } catch (error) {
         console.error(error)

@@ -1,0 +1,4 @@
+Commands to run:
+- npx hardhat run scripts/deploy.js --network rinkeby
+- set the 'contractAddress' and 'contractABI' variables in index4.js file
+- node index4.js

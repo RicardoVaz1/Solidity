@@ -36,3 +36,15 @@ Openzeppelin: https://forum.openzeppelin.com/t/openzeppelin-upgrades-step-by-ste
     > (await maincontractV2.getCounter()).toString()
 
     > (await maincontractV2.getOwnerAddress2()).toString()
+
+
+Commands new_contracts2:
+ > MainContract
+    - npx hardhat run scripts/deploy2.js --network rinkeby
+    - set the 'contractAddress' and 'contractABI' variables in index2.js file
+    - node index2.js
+
+ > MerchantContract
+    - npx hardhat run scripts/deploy3.js --network rinkeby
+    - set the 'contractAddress' and 'contractABI' variables in index3.js file
+    - node index3.js

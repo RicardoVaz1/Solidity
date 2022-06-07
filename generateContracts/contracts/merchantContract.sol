@@ -2,41 +2,31 @@
 
 pragma solidity >=0.8.0 <0.9.0;
 
-// import "./Libraries.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
-contract MerchantContract {
-    // using Address for address payable;
-    
+contract MerchantContract is Ownable {
     /* ========== SYSTEM ========== */
-    address private owner_address;
+    // address private owner_address;
     bool public paused; // true = paused; false = unpaused
+
+    /*modifier onlyOwner() {
+        require(msg.sender == owner_address, "Only Owner can call this function");
+        _;
+    }*/
 
     modifier systemState() {
         require(paused == false, "The system is paused!");
         _;
     }
 
-    modifier onlyOwner() {
-        require(msg.sender == owner_address, "Only Owner can call this function");
-        _;
-    }
 
 
     /* ========== MERCHANT ========== */
-    struct Merchant {
-        uint id;
-        address _address;
-        string name;
-        uint256 escrow_amount; // amount waiting for escrow_time to end to be added to balance
-        uint256 balance; // amount verified and ready to sendToMerchant
-    }
-
-    uint public merchantsCount; // count the nº of merchants
-    mapping(uint => Merchant) public merchants;
-
-    uint private merchant_id;
-    address public merchant_address;
+    address payable private merchant_address;   // buyers will be sending the money to merchantContract_address and then the money will be sent to this address
+    string public name;
+    uint256 private escrow_amount;              // amount waiting for escrow_time to end to be added to balance
+    uint256 private balance;                    // amount verified and ready to sendToMerchant
 
     modifier onlyMerchant() {
         require(msg.sender == merchant_address, "Only Merchant can call this function");
@@ -44,231 +34,180 @@ contract MerchantContract {
     }
 
 
-    /* ========== BUYERs ========== */
-    struct Buyer {
-        uint id;
-        address _address;
-        uint purchasesCountBuyer; // count the nº of purchases of each buyer
-    }
-
-    uint public buyersCount; // count the nº of buyers
-    mapping(uint => Buyer) public buyers;
-
 
     /* ========== PURCHASEs ========== */
     struct Purchase {
-        uint id;
-        uint256 dateI;
         uint256 dateF;
         uint256 amount;
+        uint status; // 0: default, purchase wasn't created; 1: purchase created, but not paid; 2: purchase created and paid
     }
 
-    uint public purchasesCount; // count the nº of purchases
+    // idPurchase => Purchase
     mapping(uint => Purchase) public purchases;
+
+    
     uint public escrow_time; // time the merchant has to wait, for the money to be sent to his wallet
 
 
 
     /* ========== CONSTRUCTOR ========== */
-    constructor(address OwnerAddress, address MerchantAddress, string memory MerchantName) {
-        owner_address = OwnerAddress;
+    constructor(/*address OwnerAddress,*/ address payable MerchantAddress, string memory MerchantName) {
+        // owner_address = OwnerAddress;
 
-        merchantsCount++;
-        merchants[merchantsCount] = Merchant(merchantsCount, MerchantAddress, MerchantName, 0, 0);
-        merchant_id = merchantsCount;
         merchant_address = MerchantAddress;
-        emit CreateMerchant(merchantsCount, MerchantAddress);
+        name = MerchantName;
+        escrow_amount = 0;
+        balance = 0;
         
-        paused = false;
-        buyersCount = 0;
-        purchasesCount = 0;
         escrow_time = 259200; // default: 3 days = 259200 seconds
+        paused = false;
     }
 
 
     /* ========== SYSTEM ========== */
-    function getMerchantAddress() public view /*onlyOwner*/ returns(address) {
+    function getMerchantAddress() public view onlyOwner returns(address) {
         console.log("Merchant Address: ", merchant_address);
         return merchant_address;
     }
-
-    function getMerchantAddress2(uint MerchantID) public view onlyOwner returns(address) {
-        console.log("Merchant Address: ", merchants[MerchantID]._address);
-        return merchants[MerchantID]._address;
-    }
-
-    /*function verifyMerchantAddress(address MerchantAddress) public view returns(bool) {
-        for(uint i = 0; i <= merchantsCount; i++) {
-            if(MerchantAddress == merchants[i]._address) {
-                console.log("This address already exists in the system!");
-                return true;
-            }
-        }
-        console.log("This address doens't exists in the system!");
-        return false;
-    }*/
-
-    function pauseMerchant() public /*onlyOwner*/ {
-        paused = true;
-        console.log("Merchant ", merchant_address, " is paused!");
-        emit PausedMerchant(merchant_address, paused);
-    }
-
-    function unpauseMerchant() public /*onlyOwner*/ {
-        paused = false;
-        console.log("Merchant ", merchant_address, " is unpaused!");
-        emit PausedMerchant(merchant_address, paused);
-    }
-
-    function deleteMerchant() public /*onlyOwner*/ {
-        console.log("Merchant ", merchant_address, " was deleted!");
-        emit DeletedMerchant(merchant_address);
-        delete merchants[merchant_id]._address;
-        delete merchant_address;
-    }
-
+    
     function changeEscrowTime(uint NewEscrowTime) public onlyOwner {
-        emit ChangedEscrowTime(NewEscrowTime);
         escrow_time = NewEscrowTime;
         console.log("New escrow time is: ", escrow_time);
+        emit ChangedEscrowTime(escrow_time);
     }
 
-    function complete(uint PurchaseID, uint MerchantID) public onlyOwner {
-        merchants[MerchantID].escrow_amount -= purchases[PurchaseID].amount;
-        merchants[MerchantID].balance += purchases[PurchaseID].amount;
-
-        console.log("Purchase w/ the id ", purchases[PurchaseID].id, " was added to Merchant balance!");
-        emit Complete(PurchaseID, MerchantID, merchants[MerchantID].escrow_amount, merchants[MerchantID].balance);
+    function pauseMerchant() public onlyOwner {
+        paused = true;
+        console.log("Merchant ", merchant_address, " is paused!");
+        emit PausedMerchant(address(this), paused);
     }
 
-    function sendToMerchant(uint MerchantID) public payable onlyOwner {
-        require(merchants[MerchantID].balance > 0, "Merchant Balance should be >0!!");
+    function unpauseMerchant() public onlyOwner {
+        paused = false;
+        console.log("Merchant ", merchant_address, " is unpaused!");
+        emit PausedMerchant(address(this), paused);
+    }
 
-        payable(merchants[MerchantID]._address).transfer(merchants[MerchantID].balance);
-        // payable(merchants[MerchantID]._address).transfer(msg.value);
-
-        console.log("Address: ", merchants[MerchantID]._address);
-        console.log("Balance Sent: ", merchants[MerchantID].balance);
-
-        merchants[MerchantID].balance = 0;
-        // console.log("Amount: ", merchants[MerchantID].balance);
-        emit SendToMerchant(MerchantID, merchants[MerchantID]._address, merchants[MerchantID].balance);
+    function deleteMerchant() public onlyOwner {
+        console.log("Merchant ", merchant_address, " was deleted!");
+        emit DeletedMerchant(address(this));
+        delete merchant_address;
     }
 
 
 
     /* ========== MERCHANTs ========== */
-    function changeMerchantAddress(address NewMerchantAddress) public virtual onlyMerchant systemState {
-        emit ChangedMerchantAddress(merchant_address, NewMerchantAddress);
-        merchant_address = NewMerchantAddress;
-        merchants[merchant_id]._address = NewMerchantAddress;
-        console.log("New Merchant address is: ", merchant_address);
+    function checkMyAddress() public view onlyMerchant returns(address) {
+        console.log("Merchant Address: ", merchant_address);
+        return merchant_address;
     }
 
-    function refund(address BuyerAddress, uint256 Amount) public payable onlyMerchant systemState {
-        require(Amount > 0, "Amount should be >0!!");
+    function changeMyAddress(address payable NewAddress) public onlyMerchant {
+        merchant_address = NewAddress;
+        console.log("New Merchant Address is: ", merchant_address);
+        // emit ChangedMyAddress(merchant_address);
+    }
 
-        uint MerchantID = getMerchantID(msg.sender);
-        // console.log("EscrowAmount: ", merchants[MerchantID].escrow_amount);
-        merchants[MerchantID].escrow_amount -= Amount;
-        console.log("EscrowAmount: ", merchants[MerchantID].escrow_amount);
+    function checkMyEscrowAmount() public view onlyMerchant returns(uint256) {
+        console.log("Merchant EscrowAmount: ", escrow_amount);
+        return escrow_amount;
+    }
 
-        updatePurchasesCount(BuyerAddress);
+    function checkMyBalance() public view onlyMerchant returns(uint256) {
+        console.log("Merchant Balance: ", balance);
+        return balance;
+    }
 
-        payable(BuyerAddress).transfer(Amount);
-        // payable(BuyerAddress).transfer(msg.value);
+    function createPurchase(uint idPurchase, uint256 purchaseAmount) public onlyMerchant {
+        uint256 dateF = block.timestamp + escrow_time;
+        purchases[idPurchase] = Purchase(dateF, purchaseAmount, 1);
+
+        console.log("Puchase w/ id ", idPurchase);
+        console.log(" and amount ", purchaseAmount, " was created!");
+    }
+
+    function complete(uint idPurchase) public onlyMerchant {
+        require(purchases[idPurchase].dateF < block.timestamp, "The escrow time of this purchase isn't over yet!");
+
+        escrow_amount -= purchases[idPurchase].amount;
+        balance += purchases[idPurchase].amount;
+
+        console.log("Puchase w/ id ", idPurchase, " was completed!");
+        console.log("EscrowAmount: ", escrow_amount);
+        console.log("Balance: ", balance);
+
+        emit Complete(idPurchase);
+    }
+
+    function sendToMerchant() public onlyMerchant systemState {
+        require(balance > 0, "Balance should be greater than 0!!");
+
+        merchant_address.transfer(balance);
+
+        console.log("Address: ", merchant_address);
+        console.log("Balance Sent: ", balance);
+
+        // emit SendToMerchant(merchant_address, balance);
+        balance = 0;
+    }
+
+    function refund(uint idPurchase, address payable BuyerAddress, uint256 refundAmount) public onlyMerchant {
+        require(refundAmount > 0, "Refund amount should be greater than 0!!");
+        require(refundAmount <= purchases[idPurchase].amount, "Refund amount shouldn't be greater than the purchaseAmount!");
+
+        // if(escrow_amount < refundAmount) revert("You don't have enough money in the smart-contract!");
+        if(address(this).balance < refundAmount) revert("You don't have enough money in the smart-contract!");
+
+        if(escrow_amount >= refundAmount) {
+            escrow_amount -= refundAmount;
+            console.log("EscrowAmount updated!");
+        }
+        else if(balance >= refundAmount) {
+            balance -= refundAmount;
+            console.log("Balance updated!");
+        }
+        else revert("Error processing refund, check your smart-contract balance!");
+
+        BuyerAddress.transfer(refundAmount);       
+
+        console.log("idPurchase: ", idPurchase);
         console.log("Address: ", BuyerAddress);
-        console.log("Address: ", Amount);
+        console.log("RefundAmount: ", refundAmount);
 
         // From | To | Amount
-        emit Refund(merchant_address, BuyerAddress, Amount);
+        emit Refund(address(this), BuyerAddress, refundAmount);
     }
 
-    function updatePurchasesCount(address BuyerAddress) private {
-        uint BuyerID = getBuyerID(BuyerAddress);
-        // console.log("Buyers Purchases: ", buyers[BuyerID].purchasesCountBuyer);
-        buyers[BuyerID].purchasesCountBuyer--;
-        console.log("Buyers Purchases: ", buyers[BuyerID].purchasesCountBuyer);
-    }
 
 
     /* ========== BUYERs ========== */
-    function createBuyer(address BuyerAddress) private {
-        for(uint i = 0; i < buyersCount; i++) {
-            if(BuyerAddress == buyers[i]._address) {
-                console.log("This address already exists in the system!");
-                return;
-            }
-        }
-
-        buyersCount++;
-        buyers[buyersCount] = Buyer(buyersCount, BuyerAddress, 0);
-
-        // ID | BuyerAddress
-        emit CreateBuyer(buyersCount, BuyerAddress);
-    }
-
-    function getMerchantID(address MerchantAddress) private view returns(uint) {
-        uint id;
-        for(uint i = 0; i <= merchantsCount; i++) {
-            if(MerchantAddress == merchants[i]._address) {
-                id = i;
-            }
-        }
-        return id;
-    }
-
-    function getBuyerID(address BuyerAddress) private view returns(uint) {
-        uint id;
-        for(uint i = 0; i <= buyersCount; i++) {
-            if(BuyerAddress == buyers[i]._address) {
-                id = i;
-            }
-        }
-        return id;
-    }
-
-    function buy(address BuyerAddress, uint Amount, address MerchantAddress) public systemState {
-        //require(msg.sender != merchant_address, "Only Buyer can call this funcion");
-        require(Amount > 0, "Amount should be >0!");
-
-        createBuyer(BuyerAddress);
-        // createPurchase(Amount);
-
-        uint256 dateI = block.timestamp;
-        uint256 dateF = dateI + escrow_time;
-
-        // merchants[merchant_id].escrow_amount += Amount;
-        uint MerchantID = getMerchantID(MerchantAddress);
-        merchants[MerchantID].escrow_amount += Amount;
-
-        console.log("MerchantID: ", MerchantID);
-        console.log("EscrowAmount: ", merchants[MerchantID].escrow_amount);
+    function buy(uint idPurchase) external payable systemState {
+        if(msg.value == 0) revert("Amount should be greater than 0!");
         
-        purchasesCount++;
-        purchases[purchasesCount] = Purchase(purchasesCount, dateI, dateF, Amount);
+        if(purchases[idPurchase].status == 0) revert("Purchase doesn't exist!"); // By default status is 0
+        // if(purchases[idPurchase].status == 1) revert("Purchase isn't paid!");
+        if(purchases[idPurchase].status == 2) revert("Purchase is paid!");
+        if(msg.value != purchases[idPurchase].amount) revert("Wrong amount!");
 
-        uint BuyerID = getBuyerID(BuyerAddress);
-        buyers[BuyerID].purchasesCountBuyer++;
+        escrow_amount += msg.value;
+        console.log("EscrowAmount: ", escrow_amount);
+        
+        purchases[idPurchase].status = 2;
 
-        // ID | DateI | DateF | From | To | Amount
-        emit Buy(purchasesCount, dateI, dateF, BuyerAddress, merchant_address, Amount);
+        // ID | DateF | From | To | Amount
+        emit Buy(idPurchase, purchases[idPurchase].dateF, msg.sender, address(this), msg.value);
     }
-
 
 
     /* ========== EVENTS ========== */
-    event PausedMerchant(address MerchantAddress, bool SystemState); // true = paused; false = unpaused
-    event DeletedMerchant(address MerchantAddress);
-    event ChangedMerchantAddress(address MerchantAddress, address NewMerchantAddress);
     event ChangedEscrowTime(uint NewEscrowTime);
+    event PausedMerchant(address MerchantContractAddress, bool SystemState); // true = paused; false = unpaused
+    event DeletedMerchant(address MerchantContractAddress);
+    // event ChangedMyAddress(NewAddress);
 
-    event CreateMerchant(uint MerchantID, address MerchantAddress);
-    event CreateBuyer(uint BuyerID, address BuyerAddress);
-    
     // Purchase Flow
-    event Buy(uint PurchaseID, uint256 DateI, uint256 DateF, address BuyerAddress, address MerchantAddress, uint256 Amount);
-    event Complete(uint PurchaseID, uint MerchantID, uint256 EscrowAmount, uint256 Balance);
-    event SendToMerchant(uint MerchantID, address MerchantAddress, uint256 Amount);
-    event Refund(address MerchantAddress, address BuyerAddress, uint256 Amount);
+    event Buy(uint PurchaseID, uint256 DateF, address BuyerAddress, address MerchantContractAddress, uint256 Amount);
+    event Complete(uint PurchaseID);
+    // event SendToMerchant(address MerchantAddress, uint256 Balance);
+    event Refund(address MerchantContractAddress, address BuyerAddress, uint256 Amount);
 }

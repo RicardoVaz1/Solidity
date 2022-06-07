@@ -9,10 +9,5 @@ typechain
 #Hardhat files
 cache
 artifacts
-
+_artifacts
 .openzeppelin
-
-contracts/backup_mainContract.sol
-contracts/backup_merchantContract.sol
-contracts/backup2_mainContract.sol
-contracts/backup2_merchantContract.sol

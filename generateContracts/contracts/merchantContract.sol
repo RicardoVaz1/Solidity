@@ -3,14 +3,11 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./mainContract.sol";
 import "hardhat/console.sol";
 
 contract MerchantContract is Ownable {
     /* ========== SYSTEM ========== */
     bool public paused; // true = paused; false = unpaused
-
-    MainContract mainContract;
 
     modifier systemState() {
         require(paused == false, "The system is paused!");
@@ -43,6 +40,13 @@ contract MerchantContract is Ownable {
 
     // idPurchase => Purchase
     mapping(uint => Purchase) public purchases;
+
+
+
+    /* ========== HISTORICs ========== */
+    uint private merchantHistoric;
+
+    mapping(address => uint) private buyersHistoric;
 
 
 
@@ -179,7 +183,7 @@ contract MerchantContract is Ownable {
 
         purchases[idPurchase].status = 3; // Purchase refunded
 
-        mainContract.historic(merchant_address, BuyerAddress, 1);
+        historic(BuyerAddress, 1);
 
         console.log("idPurchase: ", idPurchase);
         console.log("Address: ", BuyerAddress);
@@ -221,10 +225,41 @@ contract MerchantContract is Ownable {
         purchases[idPurchase].status = 2;
         purchases[idPurchase].escrow_amount = msg.value;
 
-        mainContract.historic(merchant_address, msg.sender, 0);
+        historic(msg.sender, 0);
 
         // ID | DateF | From | To | Amount
         emit Buy(idPurchase, purchases[idPurchase].dateF, msg.sender, address(this), msg.value);
+    }
+
+
+
+    /* ========== HISTORICs ========== */
+    function historic(address BuyerAddress, uint purchaseStatus) private {
+        if(purchaseStatus == 0) {
+            // purchase completed
+            merchantHistoric += 1;
+            buyersHistoric[BuyerAddress] += 1;
+        }
+        else {
+            // purchase refunded
+            merchantHistoric -= 1;
+            buyersHistoric[BuyerAddress] -= 1;
+        }
+
+        // MerchantContractAddress | MerchantHistoric | Buyer | BuyerHistoric
+        emit Historic(address(this), merchantHistoric, BuyerAddress, buyersHistoric[BuyerAddress]);
+    }
+
+    function getMerchantHistoric(address MerchantAddress) public view onlyOwner returns(uint) {
+        // if(MerchantAddress != merchant_address) revert("That Merchant address doesn't exist!");
+        if(MerchantAddress != merchant_address) return 0;
+        console.log("Merchant historic is: ", merchantHistoric);
+        return merchantHistoric;
+    }
+
+    function getBuyerHistoric(address BuyerAddress) public view onlyOwner returns(uint) {
+        console.log("Buyer historic is: ", buyersHistoric[BuyerAddress]);
+        return buyersHistoric[BuyerAddress];
     }
 
 
@@ -234,6 +269,7 @@ contract MerchantContract is Ownable {
     // event ChangedMyAddress(NewAddress);
     event CreatePurchase(uint256 Date, uint256 Amount, uint EscrowTime);
     event TopUpMyContract(address MerchantContractAddress, uint256 Amount);
+    event Historic(address MerchantContractAddress, uint MerchantHistoric, address BuyerAddress, uint BuyerHistoric);
 
     // Purchase Flow
     event Buy(uint PurchaseID, uint256 DateF, address BuyerAddress, address MerchantContractAddress, uint256 Amount);

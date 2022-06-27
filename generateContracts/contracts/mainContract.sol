@@ -14,36 +14,36 @@ contract MainContract {
         _;
     }
 
-    struct MerchantHistoric {
-        uint status; // 0: default, MerchantAddress doesn't exist; 1: MerchantAddress exist
-        uint historic;
-    }
-    mapping(address => MerchantHistoric) public merchantsHistoric;
-    
-    struct BuyerHistoric {
-        uint status; // 0: default, BuyerAddress doesn't exist; 1: BuyerAddress exist
-        uint historic;
-    }
-    mapping(address => BuyerHistoric) public buyersHistoric;
 
 
     /* ========== MERCHANTs ========== */
     struct Merchant {
         MerchantContract merchantContract;   // buyers will be sending the money to this address
         string name;
+        uint status; // 0: default, Merchant doesn't exist; 1: Merchant exist, but not approved; 2: Merchant exist and approved
+        uint votes;
     }
 
     uint merchantsCounter; // count the nº of merchants
     mapping(uint => Merchant) public merchants;
 
 
-    struct NewMerchant {
-        uint status; // 0: default, NewMerchant doesn't exist; 1: NewMerchant exist, but not approved; 2: NewMerchant exist and it's approved
-        uint votes;
+
+    struct Votes {
+        address MerchantContractAddress;
+        bool voted; // false: didn't vote; true: already voted
     }
 
-    uint idNewMerchant;
-    mapping(uint => NewMerchant) public merchantContractApproval;
+    // msg.sender => Votes
+    mapping(address => Votes) public saveVoters;
+
+    /*struct Votes {
+        address Voter;
+        bool voted; // false: didn't vote; true: already voted
+    }
+
+    // MerchantContractAddress => Votes
+    mapping(address => Votes) public saveVoters;*/
 
 
 
@@ -68,13 +68,16 @@ contract MainContract {
     }
 
     function addMerchantContract(address payable MerchantAddress, string memory MerchantName) public onlyOwner {
+        // Merchant { MerchantContract merchantContract, string name, uint status, uint votes }
         MerchantContract merchantContract = new MerchantContract(MerchantAddress, MerchantName);
-        merchants[merchantsCounter] = Merchant(merchantContract, MerchantName);
+        merchants[merchantsCounter] = Merchant(merchantContract, MerchantName, 1, 0);
 
         console.log("Created new Merchant!");
         console.log("MerchantContract Address: ", address(merchantContract));
         console.log("Address: ", MerchantAddress);
         console.log("Name: ", MerchantName);
+        
+        freezeWithdrawalsMerchantContract(merchantsCounter);
 
         emit CreateMerchantContract(merchantsCounter, address(merchantContract), MerchantAddress, MerchantName);
         merchantsCounter++;
@@ -94,56 +97,59 @@ contract MainContract {
         emit PausedMerchantContract(address(merchants[MerchantID].merchantContract), false);
     }
 
-    function approveMerchant(address MerchantAddress) public onlyOwner {
-        merchantsHistoric[MerchantAddress].status = 1;
-
-        console.log("MerchantAddress ", MerchantAddress, " Approved!");
-        emit ApproveMerchant(MerchantAddress);
-    }
-
-    function approveBuyer(address BuyerAddress) public onlyOwner {
-        buyersHistoric[BuyerAddress].status = 1;
-
-        console.log("BuyerAddress ", BuyerAddress, " Approved!");
-        emit ApproveBuyer(BuyerAddress);
-    }
-
-    function historic(address MerchantAddress, address BuyerAddress, uint purchaseStatus) public {
-        if(merchantsHistoric[MerchantAddress].status != 1) revert("Merchant not approved!");
-        if(buyersHistoric[BuyerAddress].status != 1) revert("Buyer not approved!");
-
-        if(purchaseStatus == 0) {
-            // purchase completed
-            merchantsHistoric[MerchantAddress].historic += 1;
-            buyersHistoric[BuyerAddress].historic += 1;
-        }
-        else {
-            // purchase refunded
-            merchantsHistoric[MerchantAddress].historic -= 1;
-            buyersHistoric[BuyerAddress].historic -= 1;
-        }
-
-        // Merchant | MerchantHistoric | Buyer | BuyerHistoric
-        emit Historic(MerchantAddress, merchantsHistoric[MerchantAddress].historic, BuyerAddress, buyersHistoric[BuyerAddress].historic);
-    }
-
     function voteNewMerchantContractApproval(uint MerchantContractID) public {
-        if(merchantsHistoric[msg.sender].status != 1 && buyersHistoric[msg.sender].status != 1) revert("Address not approved!");
+        if(merchants[MerchantContractID].status == 0) revert("Merchant doesn't exist!");
+        // if(merchants[MerchantContractID].status == 1) revert("Merchant exist but not approved!");
+        if(merchants[MerchantContractID].status == 2) revert("Merchant has already been approved!");
 
-        merchantContractApproval[MerchantContractID].votes += 1;
-        console.log("Merchant w/ id: ", MerchantContractID);
-        console.log("Number of votes: ", merchantContractApproval[MerchantContractID].votes);
+        address MerchantContractAddress = address(merchants[MerchantContractID].merchantContract);
+        if(saveVoters[msg.sender].MerchantContractAddress == MerchantContractAddress && saveVoters[msg.sender].voted == true) revert("This address has already voted!");
+        // if(saveVoters[MerchantContractAddress].Voter == msg.sender && saveVoters[MerchantContractAddress].voted == true) revert("This address has already voted!");
+
+        uint voterHistoric = getVoterHistoric(msg.sender);
+
+        if(voterHistoric != 0) {
+            if(voterHistoric <= 10) merchants[MerchantContractID].votes += (voterHistoric*voterHistoric);
+            else merchants[MerchantContractID].votes += 100;
+        }
+        else merchants[MerchantContractID].votes += 1;
+
+        saveVoters[msg.sender].MerchantContractAddress = MerchantContractAddress;
+        saveVoters[msg.sender].voted = true;
+        // saveVoters[MerchantContractAddress].Voter = msg.sender;
+        // saveVoters[MerchantContractAddress].voted = true;
+
+        console.log("MerchantID: ", MerchantContractID);
+        console.log("Merchant Address: ", MerchantContractAddress);
+        console.log("Total of votes: ", merchants[MerchantContractID].votes);
 
         // From | To
-        emit VoteNewMerchantContractApproval(msg.sender, MerchantContractID);
+        emit VoteNewMerchantContractApproval(msg.sender, MerchantContractAddress);
 
-        if(merchantContractApproval[MerchantContractID].votes > 100) {
-            merchantContractApproval[MerchantContractID].status = 2;
-            console.log("Merchant w/ id: ", MerchantContractID, " has been approved!");
+        if(merchants[MerchantContractID].votes > 1000) {
+            merchants[MerchantContractID].status = 2;
+            console.log("Merchant Address ", MerchantContractAddress, " has been approved!");
+
+            unfreezeWithdrawalsMerchantContract(MerchantContractID);
 
             // NewMerchantContractApproved
-            emit NewMerchantContractApproved(MerchantContractID);
+            emit NewMerchantContractApproved(MerchantContractAddress);
         }
+    }
+
+    function getVoterHistoric(address VoterAddress) private view returns(uint) {
+        uint voterHistoric = 0;
+
+        for(uint i = 0; i < merchantsCounter; i++) {
+            if(merchants[i].merchantContract.getMerchantHistoric(VoterAddress) != 0) {
+                voterHistoric += merchants[i].merchantContract.getMerchantHistoric(VoterAddress);
+            }
+            else if(merchants[i].merchantContract.getBuyerHistoric(VoterAddress) != 0) {
+                voterHistoric += merchants[i].merchantContract.getBuyerHistoric(VoterAddress);
+            }
+        }
+
+        return voterHistoric;
     }
 
 
@@ -153,7 +159,6 @@ contract MainContract {
     event PausedMerchantContract(address MerchantContractAddress, bool SystemState); // true = paused; false = unpaused
     event ApproveMerchant(address MerchantAddress);
     event ApproveBuyer(address BuyerAddress);
-    event Historic(address MerchantAddress, uint MerchantHistoric, address BuyerAddress, uint BuyerHistoric);
-    event VoteNewMerchantContractApproval(address Voter, uint MerchantContractID);
-    event NewMerchantContractApproved(uint MerchantContractID);
+    event VoteNewMerchantContractApproval(address Voter, address MerchantContractAddress);
+    event NewMerchantContractApproved(address MerchantContractAddress);
 }
